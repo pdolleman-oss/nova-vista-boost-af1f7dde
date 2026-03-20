@@ -42,7 +42,7 @@ const Auth = () => {
           <div className="flex justify-center mb-4">
             <Logo />
           </div>
-          <CardTitle>{isLogin ? "Inloggen" : "Account aanmaken"}</CardTitle>
+          <CardTitle className="text-foreground">{isLogin ? "Inloggen" : "Account aanmaken"}</CardTitle>
           <CardDescription>
             {isLogin ? "Log in op je Nova Vista Boost account" : "Maak een gratis account aan"}
           </CardDescription>
