@@ -38,7 +38,7 @@ export function ClientSidebar() {
 
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Hoofdmenu</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-muted-foreground">Hoofdmenu</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {mainItems.map((item) => (
@@ -58,7 +58,7 @@ export function ClientSidebar() {
         <SidebarSeparator />
 
         <SidebarGroup>
-          <SidebarGroupLabel>Overig</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-muted-foreground">Overig</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {secondaryItems.map((item) => (

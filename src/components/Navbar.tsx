@@ -8,7 +8,7 @@ const Navbar = () => (
       <Logo />
       <div className="flex items-center gap-4">
         <Link to="/auth">
-          <Button variant="ghost" size="sm">Inloggen</Button>
+          <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">Inloggen</Button>
         </Link>
         <Link to="/auth">
           <Button size="sm">Gratis starten</Button>

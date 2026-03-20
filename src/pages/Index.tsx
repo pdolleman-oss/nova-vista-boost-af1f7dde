@@ -24,7 +24,7 @@ const Index = () => (
         <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-sm text-primary mb-6">
           <Zap className="w-3.5 h-3.5" /> AI-Powered Marketing Platform
         </div>
-        <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6">
+        <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6 text-foreground">
           Versnel je groei met{" "}
           <span className="text-primary">AI Marketing</span>
         </h1>
@@ -48,8 +48,8 @@ const Index = () => (
     {/* Features */}
     <section className="py-20 px-4">
       <div className="container">
-        <h2 className="text-3xl font-bold text-center mb-12">
-          Alles wat je nodig hebt voor <span className="text-accent">groei</span>
+        <h2 className="text-3xl font-bold text-center mb-12 text-foreground">
+          Alles wat je nodig hebt voor <span className="text-primary">groei</span>
         </h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {features.map((f) => (
@@ -58,7 +58,7 @@ const Index = () => (
                 <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
                   <f.icon className="w-5 h-5 text-primary" />
                 </div>
-                <h3 className="font-semibold mb-2">{f.title}</h3>
+                <h3 className="font-semibold mb-2 text-foreground">{f.title}</h3>
                 <p className="text-sm text-muted-foreground">{f.desc}</p>
               </CardContent>
             </Card>
@@ -70,7 +70,7 @@ const Index = () => (
     {/* CTA */}
     <section className="py-20 px-4">
       <div className="container max-w-2xl text-center">
-        <h2 className="text-3xl font-bold mb-4">Klaar om te groeien?</h2>
+        <h2 className="text-3xl font-bold mb-4 text-foreground">Klaar om te groeien?</h2>
         <p className="text-muted-foreground mb-8">Start vandaag nog gratis en ontdek hoe AI je marketing kan versnellen.</p>
         <Link to="/auth">
           <Button size="lg" className="gap-2">

@@ -6,34 +6,49 @@
 
 @layer base {
   :root {
-    --background: 0 0% 6%;
-    --foreground: 180 5% 90%;
-    --card: 0 0% 10%;
-    --card-foreground: 180 5% 90%;
-    --popover: 0 0% 10%;
-    --popover-foreground: 180 5% 90%;
-    --primary: 180 64% 54%;
-    --primary-foreground: 0 0% 6%;
-    --secondary: 0 0% 16%;
-    --secondary-foreground: 180 5% 90%;
-    --muted: 0 0% 14%;
-    --muted-foreground: 0 0% 55%;
-    --accent: 40 88% 63%;
-    --accent-foreground: 0 0% 6%;
+    /* Nova Vista Boost — Official Brand System */
+    /* background: #0B0F1A → hsl(224 38% 7%) */
+    --background: 224 38% 7%;
+    --foreground: 0 0% 100%;
+
+    /* card: slightly lighter than bg */
+    --card: 224 30% 10%;
+    --card-foreground: 0 0% 100%;
+
+    --popover: 224 30% 10%;
+    --popover-foreground: 0 0% 100%;
+
+    /* primary: turquoise/cyan #00C2FF → hsl(194 100% 50%) */
+    --primary: 194 100% 50%;
+    --primary-foreground: 224 38% 7%;
+
+    --secondary: 224 25% 15%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 224 20% 14%;
+    --muted-foreground: 220 10% 55%;
+
+    /* accent: subtle gold #E8A830 → hsl(38 80% 55%) — used sparingly */
+    --accent: 38 80% 55%;
+    --accent-foreground: 224 38% 7%;
+
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 18%;
-    --input: 0 0% 18%;
-    --ring: 180 64% 54%;
+
+    --border: 224 20% 18%;
+    --input: 224 20% 18%;
+    --ring: 194 100% 50%;
     --radius: 0.75rem;
-    --sidebar-background: 0 0% 8%;
-    --sidebar-foreground: 180 5% 90%;
-    --sidebar-primary: 180 64% 54%;
-    --sidebar-primary-foreground: 0 0% 6%;
-    --sidebar-accent: 0 0% 14%;
-    --sidebar-accent-foreground: 180 5% 90%;
-    --sidebar-border: 0 0% 16%;
-    --sidebar-ring: 180 64% 54%;
+
+    /* Sidebar */
+    --sidebar-background: 224 35% 8%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 194 100% 50%;
+    --sidebar-primary-foreground: 224 38% 7%;
+    --sidebar-accent: 224 20% 14%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 224 20% 16%;
+    --sidebar-ring: 194 100% 50%;
   }
 }
 

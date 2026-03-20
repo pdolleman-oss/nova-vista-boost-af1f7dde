@@ -1,13 +1,11 @@
 import { Link } from "react-router-dom";
-import { BarChart3, ArrowUpRight } from "lucide-react";
+import logoIcon from "@/assets/logo-v3.png";
 
 const Logo = () => (
-  <Link to="/" className="flex items-center gap-2">
-    <div className="w-9 h-9 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center">
-      <BarChart3 className="w-4 h-4 text-primary" />
-    </div>
-    <span className="text-lg font-semibold tracking-tight">
-      NOVA VISTA <span className="text-accent">BOOST</span>
+  <Link to="/" className="flex items-center gap-2.5">
+    <img src={logoIcon} alt="Nova Vista Boost" className="w-8 h-8" />
+    <span className="text-lg font-semibold tracking-tight text-foreground">
+      NOVA VISTA <span className="text-primary">BOOST</span>
     </span>
   </Link>
 );
