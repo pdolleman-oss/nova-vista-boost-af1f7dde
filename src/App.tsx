@@ -13,6 +13,7 @@ import WebsiteAudits from "./pages/dashboard/WebsiteAudits";
 import AITools from "./pages/dashboard/AITools";
 import Academy from "./pages/dashboard/Academy";
 import SettingsPage from "./pages/dashboard/SettingsPage";
+import UserManagement from "./pages/dashboard/UserManagement";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -34,6 +35,7 @@ const App = () => (
             <Route path="ai-tools" element={<AITools />} />
             <Route path="academy" element={<Academy />} />
             <Route path="settings" element={<SettingsPage />} />
+            <Route path="users" element={<UserManagement />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
