@@ -7,8 +7,10 @@ import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import Logo from "@/components/Logo";
 
+type View = "login" | "register" | "forgot";
+
 const Auth = () => {
-  const [isLogin, setIsLogin] = useState(true);
+  const [view, setView] = useState<View>("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -18,7 +20,14 @@ const Auth = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      if (isLogin) {
+      if (view === "forgot") {
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: `${window.location.origin}/auth`,
+        });
+        if (error) throw error;
+        toast.success("Wachtwoord reset link verzonden! Check je e-mail.");
+        setView("login");
+      } else if (view === "login") {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         toast.success("Welkom terug!");
@@ -35,6 +44,18 @@ const Auth = () => {
     }
   };
 
+  const titles: Record<View, string> = {
+    login: "Inloggen",
+    register: "Account aanmaken",
+    forgot: "Wachtwoord vergeten",
+  };
+
+  const descriptions: Record<View, string> = {
+    login: "Log in op je Nova Vista Boost account",
+    register: "Maak een gratis account aan",
+    forgot: "Voer je e-mailadres in om je wachtwoord te resetten",
+  };
+
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4">
       <Card className="w-full max-w-md">
@@ -42,10 +63,8 @@ const Auth = () => {
           <div className="flex justify-center mb-4">
             <Logo />
           </div>
-          <CardTitle className="text-foreground">{isLogin ? "Inloggen" : "Account aanmaken"}</CardTitle>
-          <CardDescription>
-            {isLogin ? "Log in op je Nova Vista Boost account" : "Maak een gratis account aan"}
-          </CardDescription>
+          <CardTitle className="text-foreground">{titles[view]}</CardTitle>
+          <CardDescription>{descriptions[view]}</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -56,25 +75,49 @@ const Auth = () => {
               onChange={(e) => setEmail(e.target.value)}
               required
             />
-            <Input
-              type="password"
-              placeholder="Wachtwoord"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
+            {view !== "forgot" && (
+              <Input
+                type="password"
+                placeholder="Wachtwoord"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            )}
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Laden..." : isLogin ? "Inloggen" : "Registreren"}
+              {loading ? "Laden..." : view === "forgot" ? "Reset link versturen" : view === "login" ? "Inloggen" : "Registreren"}
             </Button>
           </form>
-          <p className="text-center text-sm text-muted-foreground mt-4">
-            {isLogin ? "Nog geen account?" : "Al een account?"}{" "}
+
+          {view === "login" && (
             <button
-              onClick={() => setIsLogin(!isLogin)}
-              className="text-primary hover:underline"
+              onClick={() => setView("forgot")}
+              className="block w-full text-center text-sm text-muted-foreground hover:text-primary mt-3"
             >
-              {isLogin ? "Registreer hier" : "Log hier in"}
+              Wachtwoord vergeten?
             </button>
+          )}
+
+          <p className="text-center text-sm text-muted-foreground mt-4">
+            {view === "forgot" ? (
+              <button onClick={() => setView("login")} className="text-primary hover:underline">
+                Terug naar inloggen
+              </button>
+            ) : view === "login" ? (
+              <>
+                Nog geen account?{" "}
+                <button onClick={() => setView("register")} className="text-primary hover:underline">
+                  Registreer hier
+                </button>
+              </>
+            ) : (
+              <>
+                Al een account?{" "}
+                <button onClick={() => setView("login")} className="text-primary hover:underline">
+                  Log hier in
+                </button>
+              </>
+            )}
           </p>
         </CardContent>
       </Card>
