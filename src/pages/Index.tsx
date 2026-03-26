@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { ArrowRight, BarChart3, Zap, Target, TrendingUp, Shield, Globe } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ArrowRight, BarChart3, Zap, Target, TrendingUp, Shield, Globe, Check } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
@@ -12,6 +12,36 @@ const features = [
   { icon: TrendingUp, title: "Campagne Optimalisatie", desc: "Optimaliseer je campagnes met data-gedreven AI inzichten." },
   { icon: Shield, title: "Brand Monitoring", desc: "Monitor je merk en concurrenten in real-time." },
   { icon: Globe, title: "Multi-channel", desc: "Beheer al je kanalen vanuit één dashboard." },
+];
+
+const plans = [
+  {
+    name: "Starter",
+    price: "49",
+    desc: "Perfect voor startende bureaus",
+    features: ["1 platform", "Social Media tool", "2 teamleden", "E-mail support"],
+    excluded: ["Geen documentexport", "Geen API toegang"],
+    cta: "Start met Starter",
+    popular: false,
+  },
+  {
+    name: "Professional",
+    price: "149",
+    desc: "Voor groeiende marketingbureaus",
+    features: ["5 platforms", "Alle AI tools", "10 teamleden", "PDF & Word export", "Prioriteit support"],
+    excluded: ["Geen white-label", "Geen API toegang"],
+    cta: "Start met Professional",
+    popular: true,
+  },
+  {
+    name: "Enterprise",
+    price: "399",
+    desc: "Voor gevestigde bureaus op schaal",
+    features: ["Onbeperkte platforms", "Alle AI tools", "Onbeperkt teamleden", "White-label", "API toegang", "Dedicated manager"],
+    excluded: [],
+    cta: "Start met Enterprise",
+    popular: false,
+  },
 ];
 
 const Index = () => (
@@ -38,9 +68,9 @@ const Index = () => (
               Gratis starten <ArrowRight className="w-4 h-4" />
             </Button>
           </Link>
-          <Link to="/auth">
-            <Button variant="outline" size="lg">Demo bekijken</Button>
-          </Link>
+          <a href="#pricing">
+            <Button variant="outline" size="lg">Bekijk prijzen</Button>
+          </a>
         </div>
       </div>
     </section>
@@ -60,6 +90,59 @@ const Index = () => (
                 </div>
                 <h3 className="font-semibold mb-2 text-foreground">{f.title}</h3>
                 <p className="text-sm text-muted-foreground">{f.desc}</p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    {/* Pricing */}
+    <section id="pricing" className="py-20 px-4 bg-muted/30">
+      <div className="container max-w-5xl">
+        <h2 className="text-3xl font-bold text-center mb-4 text-foreground">
+          Transparante <span className="text-primary">prijzen</span>
+        </h2>
+        <p className="text-center text-muted-foreground mb-12">Kies het plan dat past bij jouw bureau. Maandelijks opzegbaar.</p>
+        <div className="grid md:grid-cols-3 gap-6">
+          {plans.map((plan) => (
+            <Card
+              key={plan.name}
+              className={`relative flex flex-col ${plan.popular ? "border-primary shadow-lg shadow-primary/10 scale-[1.02]" : "border-border/50"}`}
+            >
+              {plan.popular && (
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-xs font-semibold px-3 py-1 rounded-full">
+                  Populairst
+                </div>
+              )}
+              <CardHeader className="text-center pb-2">
+                <CardTitle className="text-xl">{plan.name}</CardTitle>
+                <p className="text-sm text-muted-foreground">{plan.desc}</p>
+                <div className="pt-4">
+                  <span className="text-4xl font-bold text-foreground">€{plan.price}</span>
+                  <span className="text-muted-foreground">/maand</span>
+                </div>
+              </CardHeader>
+              <CardContent className="flex-1 flex flex-col">
+                <ul className="space-y-2.5 flex-1 mb-6">
+                  {plan.features.map((f) => (
+                    <li key={f} className="flex items-center gap-2 text-sm">
+                      <Check className="w-4 h-4 text-primary shrink-0" />
+                      <span>{f}</span>
+                    </li>
+                  ))}
+                  {plan.excluded.map((f) => (
+                    <li key={f} className="flex items-center gap-2 text-sm text-muted-foreground line-through">
+                      <span className="w-4 h-4 shrink-0" />
+                      <span>{f}</span>
+                    </li>
+                  ))}
+                </ul>
+                <Link to="/auth" className="w-full">
+                  <Button className="w-full" variant={plan.popular ? "default" : "outline"}>
+                    {plan.cta}
+                  </Button>
+                </Link>
               </CardContent>
             </Card>
           ))}
