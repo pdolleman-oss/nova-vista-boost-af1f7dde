@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { BookOpen, Search } from "lucide-react";
@@ -7,34 +7,57 @@ import { modules } from "./academy/academyData";
 import AcademyLessonView from "./academy/AcademyLessonView";
 import AcademyModuleView from "./academy/AcademyModuleView";
 
-const STORAGE_KEY = "nvb-academy-progress";
-
 const Academy = () => {
   const [activeModule, setActiveModule] = useState<number | null>(null);
   const [activeLesson, setActiveLesson] = useState<number | null>(null);
   const [search, setSearch] = useState("");
   const [progress, setProgress] = useState<Record<string, boolean>>({});
   const [hasAccess, setHasAccess] = useState<boolean | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) setProgress(JSON.parse(saved));
-
-    const checkAccess = async () => {
+    const init = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { setHasAccess(false); return; }
+      setUserId(user.id);
+
+      // Check access
       const { data: roles } = await supabase.from("user_roles").select("role").eq("user_id", user.id);
       const userRoles = (roles || []).map(r => r.role);
       setHasAccess(userRoles.includes("admin") || userRoles.includes("client_owner") || userRoles.length === 0);
+
+      // Load progress from database
+      const { data: progressRows } = await supabase
+        .from("academy_progress")
+        .select("item_key, completed")
+        .eq("user_id", user.id);
+
+      if (progressRows && progressRows.length > 0) {
+        const loaded: Record<string, boolean> = {};
+        progressRows.forEach(r => { loaded[r.item_key] = r.completed; });
+        setProgress(loaded);
+      }
     };
-    checkAccess();
+    init();
   }, []);
 
-  const saveProgress = (key: string, checked: boolean) => {
-    const updated = { ...progress, [key]: checked };
-    setProgress(updated);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-  };
+  const saveProgress = useCallback(async (key: string, checked: boolean) => {
+    setProgress(prev => ({ ...prev, [key]: checked }));
+
+    if (!userId) return;
+
+    if (checked) {
+      await supabase.from("academy_progress").upsert(
+        { user_id: userId, item_key: key, completed: true },
+        { onConflict: "user_id,item_key" }
+      );
+    } else {
+      await supabase.from("academy_progress")
+        .delete()
+        .eq("user_id", userId)
+        .eq("item_key", key);
+    }
+  }, [userId]);
 
   const getModuleProgress = (moduleIdx: number) => {
     const mod = modules[moduleIdx];
