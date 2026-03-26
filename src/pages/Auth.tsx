@@ -22,7 +22,7 @@ const Auth = () => {
     try {
       if (view === "forgot") {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
-          redirectTo: `${window.location.origin}/auth`,
+          redirectTo: `${window.location.origin}/reset-password`,
         });
         if (error) throw error;
         toast.success("Wachtwoord reset link verzonden! Check je e-mail.");
