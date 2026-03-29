@@ -12,6 +12,7 @@ import Pipeline from "./pages/dashboard/Pipeline";
 import WebsiteAudits from "./pages/dashboard/WebsiteAudits";
 import AITools from "./pages/dashboard/AITools";
 import SocialPublisher from "./pages/dashboard/SocialPublisher";
+import SocialHealth from "./pages/dashboard/SocialHealth";
 import ContentStudio from "./pages/dashboard/ContentStudio";
 import ContentOverview from "./pages/dashboard/ContentOverview";
 import Academy from "./pages/dashboard/Academy";
@@ -37,6 +38,7 @@ const App = () => (
             <Route path="audits" element={<WebsiteAudits />} />
             <Route path="ai-tools" element={<AITools />} />
             <Route path="social" element={<SocialPublisher />} />
+            <Route path="social/health" element={<SocialHealth />} />
             <Route path="content" element={<ContentStudio />} />
             <Route path="content/overview" element={<ContentOverview />} />
             <Route path="academy" element={<Academy />} />
