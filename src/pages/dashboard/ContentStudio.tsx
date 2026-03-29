@@ -319,7 +319,7 @@ const ContentStudio = () => {
           {/* Right: Output */}
           <div>
             {output ? (
-              <OutputPanel output={output} onApprove={handleApprove} onCopy={handleCopy} />
+              <OutputPanel output={output} onApprove={handleApprove} onCopy={handleCopy} onSchedule={handleSchedule} onPublish={handlePublish} onSaveEdit={handleSaveEdit} />
             ) : (
               <Card className="bg-card border-border border-dashed">
                 <CardContent className="flex flex-col items-center py-12">
