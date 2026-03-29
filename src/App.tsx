@@ -11,6 +11,7 @@ import LeadFinder from "./pages/dashboard/LeadFinder";
 import Pipeline from "./pages/dashboard/Pipeline";
 import WebsiteAudits from "./pages/dashboard/WebsiteAudits";
 import AITools from "./pages/dashboard/AITools";
+import SocialPublisher from "./pages/dashboard/SocialPublisher";
 import Academy from "./pages/dashboard/Academy";
 import SettingsPage from "./pages/dashboard/SettingsPage";
 import UserManagement from "./pages/dashboard/UserManagement";
@@ -33,6 +34,7 @@ const App = () => (
             <Route path="pipeline" element={<Pipeline />} />
             <Route path="audits" element={<WebsiteAudits />} />
             <Route path="ai-tools" element={<AITools />} />
+            <Route path="social" element={<SocialPublisher />} />
             <Route path="academy" element={<Academy />} />
             <Route path="settings" element={<SettingsPage />} />
             <Route path="users" element={<UserManagement />} />

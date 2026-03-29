@@ -707,6 +707,98 @@ export type Database = {
         }
         Relationships: []
       }
+      social_connections: {
+        Row: {
+          channel: Database["public"]["Enums"]["social_channel"]
+          connected_at: string
+          expires_at: string | null
+          id: string
+          is_active: boolean
+          page_access_token: string
+          page_id: string
+          page_name: string
+          user_id: string
+        }
+        Insert: {
+          channel?: Database["public"]["Enums"]["social_channel"]
+          connected_at?: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          page_access_token: string
+          page_id: string
+          page_name?: string
+          user_id: string
+        }
+        Update: {
+          channel?: Database["public"]["Enums"]["social_channel"]
+          connected_at?: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          page_access_token?: string
+          page_id?: string
+          page_name?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      social_posts: {
+        Row: {
+          channel: Database["public"]["Enums"]["social_channel"]
+          created_at: string
+          error_message: string | null
+          external_post_id: string | null
+          id: string
+          media_url: string | null
+          post_text: string
+          project_id: string | null
+          published_at: string | null
+          status: Database["public"]["Enums"]["social_post_status"]
+          title: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          channel?: Database["public"]["Enums"]["social_channel"]
+          created_at?: string
+          error_message?: string | null
+          external_post_id?: string | null
+          id?: string
+          media_url?: string | null
+          post_text: string
+          project_id?: string | null
+          published_at?: string | null
+          status?: Database["public"]["Enums"]["social_post_status"]
+          title?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          channel?: Database["public"]["Enums"]["social_channel"]
+          created_at?: string
+          error_message?: string | null
+          external_post_id?: string | null
+          id?: string
+          media_url?: string | null
+          post_text?: string
+          project_id?: string | null
+          published_at?: string | null
+          status?: Database["public"]["Enums"]["social_post_status"]
+          title?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "social_posts_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       system_prompts: {
         Row: {
           created_at: string
@@ -912,6 +1004,8 @@ export type Database = {
       app_role: "admin" | "client_owner" | "client_member"
       output_status: "draft" | "approved" | "published" | "archived"
       risk_level: "low" | "medium" | "high"
+      social_channel: "facebook"
+      social_post_status: "draft" | "approved" | "published" | "failed"
       task_priority: "low" | "medium" | "high"
       task_status: "open" | "in_progress" | "waiting_review" | "done"
     }
@@ -1045,6 +1139,8 @@ export const Constants = {
       app_role: ["admin", "client_owner", "client_member"],
       output_status: ["draft", "approved", "published", "archived"],
       risk_level: ["low", "medium", "high"],
+      social_channel: ["facebook"],
+      social_post_status: ["draft", "approved", "published", "failed"],
       task_priority: ["low", "medium", "high"],
       task_status: ["open", "in_progress", "waiting_review", "done"],
     },
