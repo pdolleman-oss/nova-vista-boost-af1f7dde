@@ -282,6 +282,244 @@ export type Database = {
         }
         Relationships: []
       }
+      content_outputs: {
+        Row: {
+          approval_status:
+            | Database["public"]["Enums"]["content_approval_status"]
+            | null
+          body: string | null
+          content_request_id: string
+          created_at: string | null
+          cta_text: string | null
+          external_post_id: string | null
+          hashtags: string[] | null
+          id: string
+          project_id: string | null
+          publish_channel: string | null
+          published_at: string | null
+          scheduled_at: string | null
+          short_version: string | null
+          status: Database["public"]["Enums"]["content_request_status"] | null
+          title: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          approval_status?:
+            | Database["public"]["Enums"]["content_approval_status"]
+            | null
+          body?: string | null
+          content_request_id: string
+          created_at?: string | null
+          cta_text?: string | null
+          external_post_id?: string | null
+          hashtags?: string[] | null
+          id?: string
+          project_id?: string | null
+          publish_channel?: string | null
+          published_at?: string | null
+          scheduled_at?: string | null
+          short_version?: string | null
+          status?: Database["public"]["Enums"]["content_request_status"] | null
+          title?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          approval_status?:
+            | Database["public"]["Enums"]["content_approval_status"]
+            | null
+          body?: string | null
+          content_request_id?: string
+          created_at?: string | null
+          cta_text?: string | null
+          external_post_id?: string | null
+          hashtags?: string[] | null
+          id?: string
+          project_id?: string | null
+          publish_channel?: string | null
+          published_at?: string | null
+          scheduled_at?: string | null
+          short_version?: string | null
+          status?: Database["public"]["Enums"]["content_request_status"] | null
+          title?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_outputs_content_request_id_fkey"
+            columns: ["content_request_id"]
+            isOneToOne: false
+            referencedRelation: "content_requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "content_outputs_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      content_recommendations: {
+        Row: {
+          content_request_id: string
+          created_at: string | null
+          id: string
+          reasoning_summary: string | null
+          risk_flags: string[] | null
+          suggested_audience: string | null
+          suggested_cta_style: string | null
+          suggested_length: string | null
+          suggested_publish_time: string | null
+          suggested_tone_of_voice: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          content_request_id: string
+          created_at?: string | null
+          id?: string
+          reasoning_summary?: string | null
+          risk_flags?: string[] | null
+          suggested_audience?: string | null
+          suggested_cta_style?: string | null
+          suggested_length?: string | null
+          suggested_publish_time?: string | null
+          suggested_tone_of_voice?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          content_request_id?: string
+          created_at?: string | null
+          id?: string
+          reasoning_summary?: string | null
+          risk_flags?: string[] | null
+          suggested_audience?: string | null
+          suggested_cta_style?: string | null
+          suggested_length?: string | null
+          suggested_publish_time?: string | null
+          suggested_tone_of_voice?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_recommendations_content_request_id_fkey"
+            columns: ["content_request_id"]
+            isOneToOne: false
+            referencedRelation: "content_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      content_requests: {
+        Row: {
+          allow_nvb_timing_advice: boolean | null
+          audience_age_group: string | null
+          audience_description: string | null
+          audience_primary: string | null
+          brand_intensity: number | null
+          campaign_title: string | null
+          channel: string
+          content_type: string
+          core_message: string | null
+          created_at: string | null
+          cta_style: string | null
+          destination_url: string | null
+          emoji_allowed: boolean | null
+          forbidden_words: string | null
+          goal: string | null
+          has_media: boolean | null
+          hashtags_enabled: boolean | null
+          id: string
+          post_action: string | null
+          price_segment: string | null
+          project_id: string | null
+          publish_timing_mode: string | null
+          required_elements: string | null
+          scheduled_at: string | null
+          status: Database["public"]["Enums"]["content_request_status"] | null
+          tone_of_voice: string[] | null
+          updated_at: string | null
+          user_id: string
+          usp_points: string[] | null
+          visual_brief: string | null
+        }
+        Insert: {
+          allow_nvb_timing_advice?: boolean | null
+          audience_age_group?: string | null
+          audience_description?: string | null
+          audience_primary?: string | null
+          brand_intensity?: number | null
+          campaign_title?: string | null
+          channel?: string
+          content_type?: string
+          core_message?: string | null
+          created_at?: string | null
+          cta_style?: string | null
+          destination_url?: string | null
+          emoji_allowed?: boolean | null
+          forbidden_words?: string | null
+          goal?: string | null
+          has_media?: boolean | null
+          hashtags_enabled?: boolean | null
+          id?: string
+          post_action?: string | null
+          price_segment?: string | null
+          project_id?: string | null
+          publish_timing_mode?: string | null
+          required_elements?: string | null
+          scheduled_at?: string | null
+          status?: Database["public"]["Enums"]["content_request_status"] | null
+          tone_of_voice?: string[] | null
+          updated_at?: string | null
+          user_id: string
+          usp_points?: string[] | null
+          visual_brief?: string | null
+        }
+        Update: {
+          allow_nvb_timing_advice?: boolean | null
+          audience_age_group?: string | null
+          audience_description?: string | null
+          audience_primary?: string | null
+          brand_intensity?: number | null
+          campaign_title?: string | null
+          channel?: string
+          content_type?: string
+          core_message?: string | null
+          created_at?: string | null
+          cta_style?: string | null
+          destination_url?: string | null
+          emoji_allowed?: boolean | null
+          forbidden_words?: string | null
+          goal?: string | null
+          has_media?: boolean | null
+          hashtags_enabled?: boolean | null
+          id?: string
+          post_action?: string | null
+          price_segment?: string | null
+          project_id?: string | null
+          publish_timing_mode?: string | null
+          required_elements?: string | null
+          scheduled_at?: string | null
+          status?: Database["public"]["Enums"]["content_request_status"] | null
+          tone_of_voice?: string[] | null
+          updated_at?: string | null
+          user_id?: string
+          usp_points?: string[] | null
+          visual_brief?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_requests_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       invitations: {
         Row: {
           created_at: string
@@ -1002,6 +1240,22 @@ export type Database = {
     Enums: {
       ai_mode: "safe" | "auto"
       app_role: "admin" | "client_owner" | "client_member"
+      content_approval_status:
+        | "pending"
+        | "approved"
+        | "rejected"
+        | "revision_requested"
+      content_request_status:
+        | "draft"
+        | "analyzing"
+        | "analyzed"
+        | "generating"
+        | "generated"
+        | "review"
+        | "approved"
+        | "scheduled"
+        | "published"
+        | "failed"
       output_status: "draft" | "approved" | "published" | "archived"
       risk_level: "low" | "medium" | "high"
       social_channel: "facebook"
@@ -1137,6 +1391,24 @@ export const Constants = {
     Enums: {
       ai_mode: ["safe", "auto"],
       app_role: ["admin", "client_owner", "client_member"],
+      content_approval_status: [
+        "pending",
+        "approved",
+        "rejected",
+        "revision_requested",
+      ],
+      content_request_status: [
+        "draft",
+        "analyzing",
+        "analyzed",
+        "generating",
+        "generated",
+        "review",
+        "approved",
+        "scheduled",
+        "published",
+        "failed",
+      ],
       output_status: ["draft", "approved", "published", "archived"],
       risk_level: ["low", "medium", "high"],
       social_channel: ["facebook"],
