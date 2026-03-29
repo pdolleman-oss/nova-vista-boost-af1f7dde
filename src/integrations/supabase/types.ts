@@ -38,6 +38,113 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_outputs: {
+        Row: {
+          created_at: string
+          id: string
+          module_name: string | null
+          output_json: Json | null
+          output_text: string | null
+          project_id: string | null
+          request_id: string | null
+          risk_level: Database["public"]["Enums"]["risk_level"]
+          status: Database["public"]["Enums"]["output_status"]
+          title: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          module_name?: string | null
+          output_json?: Json | null
+          output_text?: string | null
+          project_id?: string | null
+          request_id?: string | null
+          risk_level?: Database["public"]["Enums"]["risk_level"]
+          status?: Database["public"]["Enums"]["output_status"]
+          title?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          module_name?: string | null
+          output_json?: Json | null
+          output_text?: string | null
+          project_id?: string | null
+          request_id?: string | null
+          risk_level?: Database["public"]["Enums"]["risk_level"]
+          status?: Database["public"]["Enums"]["output_status"]
+          title?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_outputs_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_outputs_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "ai_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_requests: {
+        Row: {
+          created_at: string
+          id: string
+          input_text: string
+          module_name: string | null
+          project_id: string | null
+          status: string
+          subprompt_used: string | null
+          system_prompt_used: string | null
+          task_type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          input_text: string
+          module_name?: string | null
+          project_id?: string | null
+          status?: string
+          subprompt_used?: string | null
+          system_prompt_used?: string | null
+          task_type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          input_text?: string
+          module_name?: string | null
+          project_id?: string | null
+          status?: string
+          subprompt_used?: string | null
+          system_prompt_used?: string | null
+          task_type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_requests_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       chat_history: {
         Row: {
           created_at: string
@@ -307,6 +414,44 @@ export type Database = {
           },
         ]
       }
+      logs: {
+        Row: {
+          created_at: string
+          id: string
+          log_type: string
+          message: string
+          metadata_json: Json | null
+          project_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          log_type: string
+          message: string
+          metadata_json?: Json | null
+          project_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          log_type?: string
+          message?: string
+          metadata_json?: Json | null
+          project_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "logs_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           created_at: string
@@ -429,6 +574,45 @@ export type Database = {
         }
         Relationships: []
       }
+      projects: {
+        Row: {
+          ai_mode: Database["public"]["Enums"]["ai_mode"]
+          business_type: string | null
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          owner_id: string
+          preferred_model: string | null
+          prompt_profile: string | null
+          updated_at: string
+        }
+        Insert: {
+          ai_mode?: Database["public"]["Enums"]["ai_mode"]
+          business_type?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          owner_id: string
+          preferred_model?: string | null
+          prompt_profile?: string | null
+          updated_at?: string
+        }
+        Update: {
+          ai_mode?: Database["public"]["Enums"]["ai_mode"]
+          business_type?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          owner_id?: string
+          preferred_model?: string | null
+          prompt_profile?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       saved_leads: {
         Row: {
           company_id: string
@@ -461,6 +645,44 @@ export type Database = {
           },
         ]
       }
+      settings: {
+        Row: {
+          created_at: string
+          id: string
+          project_id: string | null
+          setting_key: string
+          setting_value: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          project_id?: string | null
+          setting_key: string
+          setting_value?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          project_id?: string | null
+          setting_key?: string
+          setting_value?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "settings_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       site_content: {
         Row: {
           content_key: string
@@ -484,6 +706,90 @@ export type Database = {
           updated_by?: string | null
         }
         Relationships: []
+      }
+      system_prompts: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          prompt_key: string
+          prompt_text: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          prompt_key: string
+          prompt_text: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          prompt_key?: string
+          prompt_text?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      tasks: {
+        Row: {
+          assigned_user_id: string
+          created_at: string
+          description: string | null
+          id: string
+          linked_output_id: string | null
+          priority: Database["public"]["Enums"]["task_priority"]
+          project_id: string | null
+          status: Database["public"]["Enums"]["task_status"]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_user_id: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          linked_output_id?: string | null
+          priority?: Database["public"]["Enums"]["task_priority"]
+          project_id?: string | null
+          status?: Database["public"]["Enums"]["task_status"]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_user_id?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          linked_output_id?: string | null
+          priority?: Database["public"]["Enums"]["task_priority"]
+          project_id?: string | null
+          status?: Database["public"]["Enums"]["task_status"]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tasks_linked_output_id_fkey"
+            columns: ["linked_output_id"]
+            isOneToOne: false
+            referencedRelation: "ai_outputs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tasks_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
@@ -602,7 +908,12 @@ export type Database = {
       }
     }
     Enums: {
+      ai_mode: "safe" | "auto"
       app_role: "admin" | "client_owner" | "client_member"
+      output_status: "draft" | "approved" | "published" | "archived"
+      risk_level: "low" | "medium" | "high"
+      task_priority: "low" | "medium" | "high"
+      task_status: "open" | "in_progress" | "waiting_review" | "done"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -730,7 +1041,12 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      ai_mode: ["safe", "auto"],
       app_role: ["admin", "client_owner", "client_member"],
+      output_status: ["draft", "approved", "published", "archived"],
+      risk_level: ["low", "medium", "high"],
+      task_priority: ["low", "medium", "high"],
+      task_status: ["open", "in_progress", "waiting_review", "done"],
     },
   },
 } as const
