@@ -277,6 +277,19 @@ async function handlePublish(body: any, userId: string, admin: any) {
   if (!output) return json({ success: false, error: "Output not found" }, 404);
   if (output.approval_status !== "approved") return json({ success: false, error: "Output must be approved before publishing" }, 400);
 
+  // ── Duplicate publish guard ──
+  if (output.status === "published") {
+    await admin.from("logs").insert({ user_id: userId, project_id: output.project_id, log_type: "duplicate_publish_blocked", message: `Duplicate publish blocked for output ${output_id}`, metadata_json: { output_id, external_post_id: output.external_post_id } });
+    return json({ success: false, error: "Deze content is al gepubliceerd. Republish is niet toegestaan." }, 409);
+  }
+  if (output.external_post_id && output.external_post_id.trim() !== "") {
+    await admin.from("logs").insert({ user_id: userId, project_id: output.project_id, log_type: "duplicate_publish_blocked", message: `Duplicate publish blocked: external_post_id already exists for output ${output_id}`, metadata_json: { output_id, external_post_id: output.external_post_id } });
+    return json({ success: false, error: "Deze content heeft al een externe post ID. Republish is niet toegestaan." }, 409);
+  }
+
+  // Update last_publish_attempt_at
+  await admin.from("content_outputs").update({ last_publish_attempt_at: new Date().toISOString() }).eq("id", output_id);
+
   const channel = (output.publish_channel || "").toLowerCase();
   const socialChannels = ["facebook"];
 

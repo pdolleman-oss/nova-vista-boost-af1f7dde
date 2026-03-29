@@ -154,7 +154,12 @@ serve(async (req) => {
         }
 
         if (post.status === "published") {
-          return jsonRes({ success: false, error: "Post already published" }, 400);
+          await supabase.from("logs").insert({ user_id: userId, log_type: "duplicate_publish_blocked", message: `Duplicate publish blocked for social post ${postId}`, metadata_json: { post_id: postId, external_post_id: post.external_post_id } });
+          return jsonRes({ success: false, error: "Deze post is al gepubliceerd. Republish is niet toegestaan." }, 409);
+        }
+        if (post.external_post_id && post.external_post_id.trim() !== "") {
+          await supabase.from("logs").insert({ user_id: userId, log_type: "duplicate_publish_blocked", message: `Duplicate publish blocked: external_post_id exists for post ${postId}`, metadata_json: { post_id: postId, external_post_id: post.external_post_id } });
+          return jsonRes({ success: false, error: "Deze post heeft al een externe post ID. Republish is niet toegestaan." }, 409);
         }
 
         // Get active connection for this channel
