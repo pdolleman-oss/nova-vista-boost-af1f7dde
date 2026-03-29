@@ -642,7 +642,7 @@ const ContentStudio = () => {
 
           {recommendation && <RecommendationPanel rec={recommendation} />}
 
-          {output && <OutputPanel output={output} onApprove={handleApprove} onCopy={handleCopy} compact />}
+          {output && <OutputPanel output={output} onApprove={handleApprove} onCopy={handleCopy} onSchedule={handleSchedule} onPublish={handlePublish} onSaveEdit={handleSaveEdit} compact />}
         </div>
       </div>
     </div>
