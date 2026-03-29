@@ -1,4 +1,4 @@
-import { BarChart3, Users, Globe, Sparkles, Settings, LogOut, LayoutDashboard, Search, BookOpen, UserCog, Share2, FileText, List, Activity } from "lucide-react";
+import { BarChart3, Users, Globe, Sparkles, Settings, LogOut, LayoutDashboard, Search, BookOpen, UserCog, Share2, FileText, List, Activity, Settings2 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import Logo from "@/components/Logo";
@@ -22,6 +22,7 @@ const mainItems = [
 
 const secondaryItems = [
   { title: "Academy", url: "/dashboard/academy", icon: BookOpen },
+  { title: "Publish Settings", url: "/dashboard/publish-settings", icon: Settings2 },
   { title: "Gebruikers", url: "/dashboard/users", icon: UserCog },
   { title: "Instellingen", url: "/dashboard/settings", icon: Settings },
 ];

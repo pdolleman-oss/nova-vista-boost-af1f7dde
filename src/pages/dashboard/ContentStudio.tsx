@@ -166,6 +166,15 @@ const ContentStudio = () => {
 
   const handlePublish = async () => {
     if (!output) return;
+    // Client-side duplicate guard
+    if (output.status === "published") {
+      toast.error("Deze content is al gepubliceerd. Republish is niet toegestaan.");
+      return;
+    }
+    if (output.external_post_id && output.external_post_id.trim() !== "") {
+      toast.error("Deze content heeft al een externe post ID. Republish is niet toegestaan.");
+      return;
+    }
     try {
       const { data, error } = await contentApi.publish(output.id);
       if (error) throw error;
@@ -798,7 +807,7 @@ function OutputPanel({ output, onApprove, onCopy, onSchedule, onPublish, onSaveE
                   <ThumbsUp className="mr-1 h-3 w-3" />Goedkeuren
                 </Button>
               )}
-              {output.approval_status === "approved" && output.status !== "published" && output.status !== "scheduled" && (
+              {output.approval_status === "approved" && output.status !== "published" && output.status !== "scheduled" && !output.external_post_id && (
                 <>
                   <Button size="sm" variant="secondary" onClick={() => setShowSchedule(!showSchedule)}>
                     <Calendar className="mr-1 h-3 w-3" />Inplannen
@@ -807,6 +816,12 @@ function OutputPanel({ output, onApprove, onCopy, onSchedule, onPublish, onSaveE
                     <Upload className="mr-1 h-3 w-3" />Publiceren
                   </Button>
                 </>
+              )}
+              {output.status === "published" && (
+                <span className="text-xs text-green-500 flex items-center gap-1">
+                  <CheckCircle2 className="h-3 w-3" /> Gepubliceerd
+                  {output.external_post_id && <span className="text-muted-foreground ml-1">({output.external_post_id})</span>}
+                </span>
               )}
             </div>
 
