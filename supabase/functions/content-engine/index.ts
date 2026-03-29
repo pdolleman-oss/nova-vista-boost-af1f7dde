@@ -277,21 +277,63 @@ async function handlePublish(body: any, userId: string, admin: any) {
   if (!output) return json({ success: false, error: "Output not found" }, 404);
   if (output.approval_status !== "approved") return json({ success: false, error: "Output must be approved before publishing" }, 400);
 
-  // Check if channel connection exists (for social channels)
-  const socialChannels = ["facebook", "instagram", "linkedin"];
   const channel = (output.publish_channel || "").toLowerCase();
+  const socialChannels = ["facebook"];
 
   if (socialChannels.includes(channel)) {
+    // Get active social connection
     const { data: conn } = await admin.from("social_connections")
-      .select("id").eq("user_id", userId).eq("channel", channel).eq("is_active", true).maybeSingle();
+      .select("*").eq("user_id", userId).eq("channel", channel).eq("is_active", true).limit(1).maybeSingle();
 
     if (!conn) {
       await admin.from("logs").insert({ user_id: userId, project_id: output.project_id, log_type: "content_publish_failed", message: `Publish failed: no ${channel} connection`, metadata_json: { output_id } });
-      return json({ success: false, error: `Geen actieve ${output.publish_channel}-koppeling gevonden. Koppel eerst je account via Social Publisher.` }, 400);
+      return json({ success: false, error: `Geen actieve ${channel}-koppeling gevonden. Koppel eerst je account via Social Publisher.` }, 400);
     }
+
+    // Log attempt
+    await admin.from("logs").insert({ user_id: userId, project_id: output.project_id, log_type: "content_publish_attempt", message: `Publishing content to ${channel}: ${output.title}`, metadata_json: { output_id, page_id: conn.page_id } });
+
+    // Build post text: body + CTA + hashtags
+    let postText = output.body || "";
+    if (output.cta_text) postText += `\n\n${output.cta_text}`;
+    if (output.hashtags?.length > 0) postText += `\n\n${output.hashtags.map((h: string) => h.startsWith("#") ? h : `#${h}`).join(" ")}`;
+
+    // Publish to Facebook Graph API
+    const fbBody: Record<string, string> = { message: postText, access_token: conn.page_access_token };
+
+    const fbRes = await fetch(`https://graph.facebook.com/v21.0/${conn.page_id}/feed`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(fbBody),
+    });
+    const fbData = await fbRes.json();
+
+    if (fbData.error) {
+      await admin.from("content_outputs").update({ status: "failed" }).eq("id", output_id);
+      await admin.from("logs").insert({ user_id: userId, project_id: output.project_id, log_type: "content_publish_failed", message: `Facebook publish failed: ${fbData.error.message}`, metadata_json: { output_id, fb_error: fbData.error } });
+      return json({ success: false, error: `Facebook publicatie mislukt: ${fbData.error.message}` }, 400);
+    }
+
+    // Also create a social_posts record for tracking
+    await admin.from("social_posts").insert({
+      user_id: userId, project_id: output.project_id, channel: "facebook",
+      title: output.title || "", post_text: postText,
+      status: "published", external_post_id: fbData.id, published_at: new Date().toISOString(),
+    });
+
+    // Update content output
+    const { data, error } = await admin.from("content_outputs")
+      .update({ status: "published", published_at: new Date().toISOString(), external_post_id: fbData.id })
+      .eq("id", output_id).select().single();
+    if (error) throw error;
+
+    await admin.from("content_requests").update({ status: "published" }).eq("id", output.content_request_id);
+    await admin.from("logs").insert({ user_id: userId, project_id: output.project_id, log_type: "content_published", message: `Content published to Facebook: ${output.title} (${fbData.id})`, metadata_json: { output_id, external_post_id: fbData.id } });
+
+    return json({ success: true, data });
   }
 
-  // Mark as published (actual external publish via Social Publisher integration)
+  // Non-social channels: mark as published without external API call
   const { data, error } = await admin.from("content_outputs")
     .update({ status: "published", published_at: new Date().toISOString() })
     .eq("id", output_id).select().single();
