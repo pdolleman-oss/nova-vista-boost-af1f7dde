@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import {
   FileText, Sparkles, Send, Save, Loader2, CheckCircle2, Clock,
   ArrowLeft, Plus, ChevronRight, AlertTriangle, Copy, ThumbsUp,
+  Calendar, Upload, Edit3, X,
 } from "lucide-react";
 import { contentApi, type ContentRecommendation, type ContentOutput } from "@/services/contentApi";
 import { nvbProjects, type Project } from "@/services/nvbApi";
