@@ -294,8 +294,12 @@ export type Database = {
           external_post_id: string | null
           hashtags: string[] | null
           id: string
+          last_publish_attempt_at: string | null
+          last_publish_error: string | null
           project_id: string | null
           publish_channel: string | null
+          publish_mode: string | null
+          publish_validation_status: string | null
           published_at: string | null
           scheduled_at: string | null
           short_version: string | null
@@ -315,8 +319,12 @@ export type Database = {
           external_post_id?: string | null
           hashtags?: string[] | null
           id?: string
+          last_publish_attempt_at?: string | null
+          last_publish_error?: string | null
           project_id?: string | null
           publish_channel?: string | null
+          publish_mode?: string | null
+          publish_validation_status?: string | null
           published_at?: string | null
           scheduled_at?: string | null
           short_version?: string | null
@@ -336,8 +344,12 @@ export type Database = {
           external_post_id?: string | null
           hashtags?: string[] | null
           id?: string
+          last_publish_attempt_at?: string | null
+          last_publish_error?: string | null
           project_id?: string | null
           publish_channel?: string | null
+          publish_mode?: string | null
+          publish_validation_status?: string | null
           published_at?: string | null
           scheduled_at?: string | null
           short_version?: string | null
@@ -815,38 +827,56 @@ export type Database = {
       projects: {
         Row: {
           ai_mode: Database["public"]["Enums"]["ai_mode"]
+          auto_mode_enabled: boolean
           business_type: string | null
           created_at: string
+          default_test_page_id: string | null
           description: string | null
+          health_status: string | null
           id: string
+          last_health_check_at: string | null
           name: string
           owner_id: string
           preferred_model: string | null
           prompt_profile: string | null
+          safe_mode_enabled: boolean
+          test_mode_enabled: boolean
           updated_at: string
         }
         Insert: {
           ai_mode?: Database["public"]["Enums"]["ai_mode"]
+          auto_mode_enabled?: boolean
           business_type?: string | null
           created_at?: string
+          default_test_page_id?: string | null
           description?: string | null
+          health_status?: string | null
           id?: string
+          last_health_check_at?: string | null
           name: string
           owner_id: string
           preferred_model?: string | null
           prompt_profile?: string | null
+          safe_mode_enabled?: boolean
+          test_mode_enabled?: boolean
           updated_at?: string
         }
         Update: {
           ai_mode?: Database["public"]["Enums"]["ai_mode"]
+          auto_mode_enabled?: boolean
           business_type?: string | null
           created_at?: string
+          default_test_page_id?: string | null
           description?: string | null
+          health_status?: string | null
           id?: string
+          last_health_check_at?: string | null
           name?: string
           owner_id?: string
           preferred_model?: string | null
           prompt_profile?: string | null
+          safe_mode_enabled?: boolean
+          test_mode_enabled?: boolean
           updated_at?: string
         }
         Relationships: []
@@ -952,9 +982,14 @@ export type Database = {
           expires_at: string | null
           id: string
           is_active: boolean
+          is_test_connection: boolean
+          last_error_message: string | null
+          last_validated_at: string | null
+          last_validation_status: string | null
           page_access_token: string
           page_id: string
           page_name: string
+          permissions_json: Json | null
           user_id: string
         }
         Insert: {
@@ -963,9 +998,14 @@ export type Database = {
           expires_at?: string | null
           id?: string
           is_active?: boolean
+          is_test_connection?: boolean
+          last_error_message?: string | null
+          last_validated_at?: string | null
+          last_validation_status?: string | null
           page_access_token: string
           page_id: string
           page_name?: string
+          permissions_json?: Json | null
           user_id: string
         }
         Update: {
@@ -974,62 +1014,265 @@ export type Database = {
           expires_at?: string | null
           id?: string
           is_active?: boolean
+          is_test_connection?: boolean
+          last_error_message?: string | null
+          last_validated_at?: string | null
+          last_validation_status?: string | null
           page_access_token?: string
           page_id?: string
           page_name?: string
+          permissions_json?: Json | null
           user_id?: string
         }
         Relationships: []
       }
+      social_health_checks: {
+        Row: {
+          channel: string
+          checked_at: string | null
+          connection_id: string | null
+          content_valid: boolean | null
+          created_at: string | null
+          cta_detected: boolean | null
+          errors: string[] | null
+          external_post_id: string | null
+          hashtags_detected: boolean | null
+          id: string
+          mode: string
+          page_connected: boolean | null
+          project_id: string | null
+          publish_test_success: boolean | null
+          raw_response: Json | null
+          retrievable: boolean | null
+          status: string
+          token_valid: boolean | null
+          warnings: string[] | null
+        }
+        Insert: {
+          channel?: string
+          checked_at?: string | null
+          connection_id?: string | null
+          content_valid?: boolean | null
+          created_at?: string | null
+          cta_detected?: boolean | null
+          errors?: string[] | null
+          external_post_id?: string | null
+          hashtags_detected?: boolean | null
+          id?: string
+          mode?: string
+          page_connected?: boolean | null
+          project_id?: string | null
+          publish_test_success?: boolean | null
+          raw_response?: Json | null
+          retrievable?: boolean | null
+          status?: string
+          token_valid?: boolean | null
+          warnings?: string[] | null
+        }
+        Update: {
+          channel?: string
+          checked_at?: string | null
+          connection_id?: string | null
+          content_valid?: boolean | null
+          created_at?: string | null
+          cta_detected?: boolean | null
+          errors?: string[] | null
+          external_post_id?: string | null
+          hashtags_detected?: boolean | null
+          id?: string
+          mode?: string
+          page_connected?: boolean | null
+          project_id?: string | null
+          publish_test_success?: boolean | null
+          raw_response?: Json | null
+          retrievable?: boolean | null
+          status?: string
+          token_valid?: boolean | null
+          warnings?: string[] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "social_health_checks_connection_id_fkey"
+            columns: ["connection_id"]
+            isOneToOne: false
+            referencedRelation: "social_connections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "social_health_checks_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       social_posts: {
         Row: {
           channel: Database["public"]["Enums"]["social_channel"]
+          connection_id: string | null
+          content_output_id: string | null
+          content_validated: boolean | null
           created_at: string
+          cta_detected: boolean | null
+          error_code: string | null
+          error_details: Json | null
           error_message: string | null
           external_post_id: string | null
+          full_payload: Json | null
+          hashtags_detected: boolean | null
           id: string
           media_url: string | null
+          mode: string | null
           post_text: string
           project_id: string | null
           published_at: string | null
+          retrieved_after_publish: boolean | null
           status: Database["public"]["Enums"]["social_post_status"]
           title: string | null
           updated_at: string
           user_id: string
+          validation_result: Json | null
         }
         Insert: {
           channel?: Database["public"]["Enums"]["social_channel"]
+          connection_id?: string | null
+          content_output_id?: string | null
+          content_validated?: boolean | null
           created_at?: string
+          cta_detected?: boolean | null
+          error_code?: string | null
+          error_details?: Json | null
           error_message?: string | null
           external_post_id?: string | null
+          full_payload?: Json | null
+          hashtags_detected?: boolean | null
           id?: string
           media_url?: string | null
+          mode?: string | null
           post_text: string
           project_id?: string | null
           published_at?: string | null
+          retrieved_after_publish?: boolean | null
           status?: Database["public"]["Enums"]["social_post_status"]
           title?: string | null
           updated_at?: string
           user_id: string
+          validation_result?: Json | null
         }
         Update: {
           channel?: Database["public"]["Enums"]["social_channel"]
+          connection_id?: string | null
+          content_output_id?: string | null
+          content_validated?: boolean | null
           created_at?: string
+          cta_detected?: boolean | null
+          error_code?: string | null
+          error_details?: Json | null
           error_message?: string | null
           external_post_id?: string | null
+          full_payload?: Json | null
+          hashtags_detected?: boolean | null
           id?: string
           media_url?: string | null
+          mode?: string | null
           post_text?: string
           project_id?: string | null
           published_at?: string | null
+          retrieved_after_publish?: boolean | null
           status?: Database["public"]["Enums"]["social_post_status"]
           title?: string | null
           updated_at?: string
           user_id?: string
+          validation_result?: Json | null
         }
         Relationships: [
           {
             foreignKeyName: "social_posts_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      social_test_runs: {
+        Row: {
+          channel: string
+          connection_id: string | null
+          created_at: string | null
+          created_test_post: boolean | null
+          deleted_test_post: boolean | null
+          errors: string[] | null
+          external_post_id: string | null
+          finished_at: string | null
+          id: string
+          initiated_by_user_id: string
+          project_id: string | null
+          request_payload: Json | null
+          response_payload: Json | null
+          retrieved_test_post: boolean | null
+          started_at: string | null
+          status: string
+          summary: string | null
+          test_type: string
+          updated_at: string | null
+          warnings: string[] | null
+        }
+        Insert: {
+          channel?: string
+          connection_id?: string | null
+          created_at?: string | null
+          created_test_post?: boolean | null
+          deleted_test_post?: boolean | null
+          errors?: string[] | null
+          external_post_id?: string | null
+          finished_at?: string | null
+          id?: string
+          initiated_by_user_id: string
+          project_id?: string | null
+          request_payload?: Json | null
+          response_payload?: Json | null
+          retrieved_test_post?: boolean | null
+          started_at?: string | null
+          status?: string
+          summary?: string | null
+          test_type?: string
+          updated_at?: string | null
+          warnings?: string[] | null
+        }
+        Update: {
+          channel?: string
+          connection_id?: string | null
+          created_at?: string | null
+          created_test_post?: boolean | null
+          deleted_test_post?: boolean | null
+          errors?: string[] | null
+          external_post_id?: string | null
+          finished_at?: string | null
+          id?: string
+          initiated_by_user_id?: string
+          project_id?: string | null
+          request_payload?: Json | null
+          response_payload?: Json | null
+          retrieved_test_post?: boolean | null
+          started_at?: string | null
+          status?: string
+          summary?: string | null
+          test_type?: string
+          updated_at?: string | null
+          warnings?: string[] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "social_test_runs_connection_id_fkey"
+            columns: ["connection_id"]
+            isOneToOne: false
+            referencedRelation: "social_connections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "social_test_runs_project_id_fkey"
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "projects"
