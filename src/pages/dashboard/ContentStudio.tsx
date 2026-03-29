@@ -141,11 +141,51 @@ const ContentStudio = () => {
   const handleApprove = async () => {
     if (!output) return;
     try {
-      await contentApi.updateOutput(output.id, { approval_status: "approved", status: "approved" });
-      setOutput({ ...output, approval_status: "approved", status: "approved" });
+      const { data, error } = await contentApi.approve(output.id);
+      if (error) throw error;
+      if (!data?.success) throw new Error(data?.error || "Goedkeuren mislukt");
+      setOutput(data.data);
       toast.success("Content goedgekeurd");
+    } catch (e: any) {
+      toast.error(e.message || "Goedkeuren mislukt");
+    }
+  };
+
+  const handleSchedule = async (scheduledAt: string) => {
+    if (!output) return;
+    try {
+      const { data, error } = await contentApi.schedule(output.id, scheduledAt);
+      if (error) throw error;
+      if (!data?.success) throw new Error(data?.error || "Inplannen mislukt");
+      setOutput(data.data);
+      toast.success("Content ingepland");
+    } catch (e: any) {
+      toast.error(e.message || "Inplannen mislukt");
+    }
+  };
+
+  const handlePublish = async () => {
+    if (!output) return;
+    try {
+      const { data, error } = await contentApi.publish(output.id);
+      if (error) throw error;
+      if (!data?.success) throw new Error(data?.error || "Publiceren mislukt");
+      setOutput(data.data);
+      toast.success("Content gepubliceerd");
+    } catch (e: any) {
+      toast.error(e.message || "Publiceren mislukt");
+    }
+  };
+
+  const handleSaveEdit = async (updates: { body: string; cta_text: string; title: string }) => {
+    if (!output) return;
+    try {
+      const { error } = await contentApi.updateOutput(output.id, updates);
+      if (error) throw error;
+      setOutput({ ...output, ...updates });
+      toast.success("Wijzigingen opgeslagen");
     } catch {
-      toast.error("Goedkeuren mislukt");
+      toast.error("Opslaan mislukt");
     }
   };
 
