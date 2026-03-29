@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import {
   FileText, Sparkles, Send, Save, Loader2, CheckCircle2, Clock,
   ArrowLeft, Plus, ChevronRight, AlertTriangle, Copy, ThumbsUp,
+  Calendar, Upload, Edit3, X,
 } from "lucide-react";
 import { contentApi, type ContentRecommendation, type ContentOutput } from "@/services/contentApi";
 import { nvbProjects, type Project } from "@/services/nvbApi";
@@ -140,11 +141,51 @@ const ContentStudio = () => {
   const handleApprove = async () => {
     if (!output) return;
     try {
-      await contentApi.updateOutput(output.id, { approval_status: "approved", status: "approved" });
-      setOutput({ ...output, approval_status: "approved", status: "approved" });
+      const { data, error } = await contentApi.approve(output.id);
+      if (error) throw error;
+      if (!data?.success) throw new Error(data?.error || "Goedkeuren mislukt");
+      setOutput(data.data);
       toast.success("Content goedgekeurd");
+    } catch (e: any) {
+      toast.error(e.message || "Goedkeuren mislukt");
+    }
+  };
+
+  const handleSchedule = async (scheduledAt: string) => {
+    if (!output) return;
+    try {
+      const { data, error } = await contentApi.schedule(output.id, scheduledAt);
+      if (error) throw error;
+      if (!data?.success) throw new Error(data?.error || "Inplannen mislukt");
+      setOutput(data.data);
+      toast.success("Content ingepland");
+    } catch (e: any) {
+      toast.error(e.message || "Inplannen mislukt");
+    }
+  };
+
+  const handlePublish = async () => {
+    if (!output) return;
+    try {
+      const { data, error } = await contentApi.publish(output.id);
+      if (error) throw error;
+      if (!data?.success) throw new Error(data?.error || "Publiceren mislukt");
+      setOutput(data.data);
+      toast.success("Content gepubliceerd");
+    } catch (e: any) {
+      toast.error(e.message || "Publiceren mislukt");
+    }
+  };
+
+  const handleSaveEdit = async (updates: { body: string; cta_text: string; title: string }) => {
+    if (!output) return;
+    try {
+      const { error } = await contentApi.updateOutput(output.id, updates);
+      if (error) throw error;
+      setOutput({ ...output, ...updates });
+      toast.success("Wijzigingen opgeslagen");
     } catch {
-      toast.error("Goedkeuren mislukt");
+      toast.error("Opslaan mislukt");
     }
   };
 
@@ -278,7 +319,7 @@ const ContentStudio = () => {
           {/* Right: Output */}
           <div>
             {output ? (
-              <OutputPanel output={output} onApprove={handleApprove} onCopy={handleCopy} />
+              <OutputPanel output={output} onApprove={handleApprove} onCopy={handleCopy} onSchedule={handleSchedule} onPublish={handlePublish} onSaveEdit={handleSaveEdit} />
             ) : (
               <Card className="bg-card border-border border-dashed">
                 <CardContent className="flex flex-col items-center py-12">
@@ -601,7 +642,7 @@ const ContentStudio = () => {
 
           {recommendation && <RecommendationPanel rec={recommendation} />}
 
-          {output && <OutputPanel output={output} onApprove={handleApprove} onCopy={handleCopy} compact />}
+          {output && <OutputPanel output={output} onApprove={handleApprove} onCopy={handleCopy} onSchedule={handleSchedule} onPublish={handlePublish} onSaveEdit={handleSaveEdit} compact />}
         </div>
       </div>
     </div>
@@ -647,54 +688,141 @@ function RecommendationPanel({ rec }: { rec: ContentRecommendation }) {
   );
 }
 
-function OutputPanel({ output, onApprove, onCopy, compact }: { output: ContentOutput; onApprove: () => void; onCopy: () => void; compact?: boolean }) {
+function OutputPanel({ output, onApprove, onCopy, onSchedule, onPublish, onSaveEdit, compact }: {
+  output: ContentOutput;
+  onApprove: () => void;
+  onCopy: () => void;
+  onSchedule: (scheduledAt: string) => void;
+  onPublish: () => void;
+  onSaveEdit: (updates: { body: string; cta_text: string; title: string }) => void;
+  compact?: boolean;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [editBody, setEditBody] = useState(output.body);
+  const [editCta, setEditCta] = useState(output.cta_text);
+  const [editTitle, setEditTitle] = useState(output.title);
+  const [scheduleDate, setScheduleDate] = useState("");
+  const [showSchedule, setShowSchedule] = useState(false);
+
+  const statusLabel: Record<string, { text: string; cls: string }> = {
+    draft: { text: "Concept", cls: "bg-muted text-muted-foreground" },
+    generated: { text: "Gegenereerd", cls: "bg-accent/10 text-accent" },
+    approved: { text: "Goedgekeurd", cls: "bg-green-500/10 text-green-500" },
+    scheduled: { text: "Ingepland", cls: "bg-primary/10 text-primary" },
+    published: { text: "Gepubliceerd", cls: "bg-green-500/10 text-green-500" },
+    failed: { text: "Mislukt", cls: "bg-destructive/10 text-destructive" },
+  };
+  const st = statusLabel[output.status] || statusLabel.draft;
+
   return (
     <Card className="bg-card border-border">
       <CardHeader className="pb-3">
-        <CardTitle className={`${compact ? "text-sm" : "text-lg"} text-foreground`}>
-          {output.title || "Gegenereerde content"}
-        </CardTitle>
-        <CardDescription className="flex items-center gap-2">
-          <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-            output.approval_status === "approved" ? "bg-green-500/10 text-green-500" : "bg-accent/10 text-accent"
-          }`}>
-            {output.approval_status === "approved" ? "Goedgekeurd" : "In review"}
-          </span>
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-3">
-        <div className="bg-muted rounded-lg p-4">
-          <p className="text-foreground text-sm whitespace-pre-wrap">{output.body}</p>
-        </div>
-        {output.cta_text && (
-          <div>
-            <span className="text-xs text-muted-foreground">CTA:</span>
-            <p className="text-primary font-medium text-sm">{output.cta_text}</p>
-          </div>
-        )}
-        {output.hashtags?.length > 0 && (
-          <div className="flex flex-wrap gap-1">
-            {output.hashtags.map((h, i) => (
-              <span key={i} className="text-xs text-primary">#{h}</span>
-            ))}
-          </div>
-        )}
-        {output.short_version && (
-          <div>
-            <span className="text-xs text-muted-foreground">Korte versie:</span>
-            <p className="text-foreground text-sm mt-1">{output.short_version}</p>
-          </div>
-        )}
-        <div className="flex gap-2 pt-2">
-          <Button size="sm" variant="secondary" onClick={onCopy}>
-            <Copy className="mr-1 h-3 w-3" />Kopieer
-          </Button>
-          {output.approval_status !== "approved" && (
-            <Button size="sm" onClick={onApprove}>
-              <ThumbsUp className="mr-1 h-3 w-3" />Goedkeuren
+        <div className="flex items-center justify-between">
+          <CardTitle className={`${compact ? "text-sm" : "text-lg"} text-foreground`}>
+            {editing ? (
+              <Input value={editTitle} onChange={e => setEditTitle(e.target.value)} className="bg-background" />
+            ) : (
+              output.title || "Gegenereerde content"
+            )}
+          </CardTitle>
+          {!editing && output.status !== "published" && (
+            <Button size="sm" variant="ghost" onClick={() => { setEditing(true); setEditBody(output.body); setEditCta(output.cta_text); setEditTitle(output.title); }}>
+              <Edit3 className="h-3 w-3" />
             </Button>
           )}
         </div>
+        <CardDescription className="flex items-center gap-2">
+          <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${st.cls}`}>{st.text}</span>
+          {output.approval_status === "approved" && <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-green-500/10 text-green-500">✓ Approved</span>}
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        {editing ? (
+          <>
+            <textarea
+              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground min-h-[120px] resize-y"
+              value={editBody}
+              onChange={e => setEditBody(e.target.value)}
+            />
+            <div>
+              <label className="text-xs text-muted-foreground">CTA:</label>
+              <Input value={editCta} onChange={e => setEditCta(e.target.value)} className="bg-background mt-1" />
+            </div>
+            <div className="flex gap-2">
+              <Button size="sm" onClick={() => { onSaveEdit({ body: editBody, cta_text: editCta, title: editTitle }); setEditing(false); }}>
+                <Save className="mr-1 h-3 w-3" />Opslaan
+              </Button>
+              <Button size="sm" variant="ghost" onClick={() => setEditing(false)}>
+                <X className="mr-1 h-3 w-3" />Annuleren
+              </Button>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="bg-muted rounded-lg p-4">
+              <p className="text-foreground text-sm whitespace-pre-wrap">{output.body}</p>
+            </div>
+            {output.cta_text && (
+              <div>
+                <span className="text-xs text-muted-foreground">CTA:</span>
+                <p className="text-primary font-medium text-sm">{output.cta_text}</p>
+              </div>
+            )}
+            {output.hashtags?.length > 0 && (
+              <div className="flex flex-wrap gap-1">
+                {output.hashtags.map((h, i) => (
+                  <span key={i} className="text-xs text-primary">#{h}</span>
+                ))}
+              </div>
+            )}
+            {output.short_version && (
+              <div>
+                <span className="text-xs text-muted-foreground">Korte versie:</span>
+                <p className="text-foreground text-sm mt-1">{output.short_version}</p>
+              </div>
+            )}
+            {output.scheduled_at && (
+              <div>
+                <span className="text-xs text-muted-foreground">Ingepland:</span>
+                <p className="text-foreground text-sm">{new Date(output.scheduled_at).toLocaleString("nl-NL")}</p>
+              </div>
+            )}
+
+            {/* Action buttons */}
+            <div className="flex flex-wrap gap-2 pt-2 border-t border-border">
+              <Button size="sm" variant="secondary" onClick={onCopy}>
+                <Copy className="mr-1 h-3 w-3" />Kopieer
+              </Button>
+              {output.approval_status !== "approved" && output.status !== "published" && (
+                <Button size="sm" onClick={onApprove}>
+                  <ThumbsUp className="mr-1 h-3 w-3" />Goedkeuren
+                </Button>
+              )}
+              {output.approval_status === "approved" && output.status !== "published" && output.status !== "scheduled" && (
+                <>
+                  <Button size="sm" variant="secondary" onClick={() => setShowSchedule(!showSchedule)}>
+                    <Calendar className="mr-1 h-3 w-3" />Inplannen
+                  </Button>
+                  <Button size="sm" onClick={onPublish}>
+                    <Upload className="mr-1 h-3 w-3" />Publiceren
+                  </Button>
+                </>
+              )}
+            </div>
+
+            {showSchedule && (
+              <div className="flex gap-2 items-end">
+                <div className="flex-1">
+                  <label className="text-xs text-muted-foreground">Datum/tijd</label>
+                  <Input type="datetime-local" value={scheduleDate} onChange={e => setScheduleDate(e.target.value)} className="bg-background" />
+                </div>
+                <Button size="sm" disabled={!scheduleDate} onClick={() => { onSchedule(scheduleDate); setShowSchedule(false); }}>
+                  Bevestigen
+                </Button>
+              </div>
+            )}
+          </>
+        )}
       </CardContent>
     </Card>
   );

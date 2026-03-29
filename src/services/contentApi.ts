@@ -72,6 +72,7 @@ export interface ContentOutput {
 export type ContentRequestInput = Omit<ContentRequest, "id" | "user_id" | "status" | "created_at" | "updated_at">;
 
 export const contentApi = {
+  // ─── Requests ───
   async createRequest(input: Partial<ContentRequestInput>) {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error("Not authenticated");
@@ -83,10 +84,7 @@ export const contentApi = {
   },
 
   async listRequests() {
-    return supabase
-      .from("content_requests")
-      .select("*")
-      .order("created_at", { ascending: false });
+    return supabase.from("content_requests").select("*").order("created_at", { ascending: false });
   },
 
   async getRequest(id: string) {
@@ -97,6 +95,7 @@ export const contentApi = {
     return supabase.from("content_requests").update(updates as any).eq("id", id).select().single();
   },
 
+  // ─── AI Actions ───
   async analyze(contentRequestId: string) {
     return supabase.functions.invoke("content-engine/analyze", {
       body: { content_request_id: contentRequestId },
@@ -109,6 +108,26 @@ export const contentApi = {
     });
   },
 
+  // ─── Output Actions ───
+  async approve(outputId: string) {
+    return supabase.functions.invoke("content-engine/approve", {
+      body: { output_id: outputId },
+    });
+  },
+
+  async schedule(outputId: string, scheduledAt: string) {
+    return supabase.functions.invoke("content-engine/schedule", {
+      body: { output_id: outputId, scheduled_at: scheduledAt },
+    });
+  },
+
+  async publish(outputId: string) {
+    return supabase.functions.invoke("content-engine/publish", {
+      body: { output_id: outputId },
+    });
+  },
+
+  // ─── Reads ───
   async getRecommendation(contentRequestId: string) {
     return supabase
       .from("content_recommendations")
@@ -134,9 +153,6 @@ export const contentApi = {
   },
 
   async listOutputs() {
-    return supabase
-      .from("content_outputs")
-      .select("*")
-      .order("created_at", { ascending: false });
+    return supabase.from("content_outputs").select("*").order("created_at", { ascending: false });
   },
 };
