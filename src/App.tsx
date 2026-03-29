@@ -13,6 +13,7 @@ import WebsiteAudits from "./pages/dashboard/WebsiteAudits";
 import AITools from "./pages/dashboard/AITools";
 import SocialPublisher from "./pages/dashboard/SocialPublisher";
 import ContentStudio from "./pages/dashboard/ContentStudio";
+import ContentOverview from "./pages/dashboard/ContentOverview";
 import Academy from "./pages/dashboard/Academy";
 import SettingsPage from "./pages/dashboard/SettingsPage";
 import UserManagement from "./pages/dashboard/UserManagement";
@@ -37,6 +38,7 @@ const App = () => (
             <Route path="ai-tools" element={<AITools />} />
             <Route path="social" element={<SocialPublisher />} />
             <Route path="content" element={<ContentStudio />} />
+            <Route path="content/overview" element={<ContentOverview />} />
             <Route path="academy" element={<Academy />} />
             <Route path="settings" element={<SettingsPage />} />
             <Route path="users" element={<UserManagement />} />
