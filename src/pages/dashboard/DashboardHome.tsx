@@ -180,6 +180,76 @@ const DashboardHome = () => {
             </CardContent>
           </Card>
 
+          {/* Content summary widget */}
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle className="text-lg">Content overzicht</CardTitle>
+              <Button variant="ghost" size="sm" onClick={() => navigate("/dashboard/content/overview")} className="gap-1 text-xs">
+                Bekijk alles <ArrowRight className="w-3 h-3" />
+              </Button>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-4 sm:grid-cols-3">
+                {/* Published */}
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-sm font-medium">
+                    <CheckCircle2 className="w-4 h-4 text-green-500" />
+                    <span>Gepubliceerd</span>
+                    <Badge variant="secondary" className="ml-auto text-xs">{contentItems.published.length}</Badge>
+                  </div>
+                  {contentItems.published.length === 0 ? (
+                    <p className="text-xs text-muted-foreground pl-6">Nog geen publicaties</p>
+                  ) : contentItems.published.map(item => (
+                    <div key={item.id} className="pl-6 space-y-0.5">
+                      <p className="text-sm truncate">{item.title || "Zonder titel"}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {item.published_at ? new Date(item.published_at).toLocaleDateString("nl-NL", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : "—"}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Scheduled */}
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-sm font-medium">
+                    <CalendarClock className="w-4 h-4 text-primary" />
+                    <span>Ingepland</span>
+                    <Badge variant="secondary" className="ml-auto text-xs">{contentItems.scheduled.length}</Badge>
+                  </div>
+                  {contentItems.scheduled.length === 0 ? (
+                    <p className="text-xs text-muted-foreground pl-6">Niets ingepland</p>
+                  ) : contentItems.scheduled.map(item => (
+                    <div key={item.id} className="pl-6 space-y-0.5">
+                      <p className="text-sm truncate">{item.title || "Zonder titel"}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {item.scheduled_at ? new Date(item.scheduled_at).toLocaleDateString("nl-NL", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : "—"}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Failed */}
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-sm font-medium">
+                    <AlertTriangle className="w-4 h-4 text-destructive" />
+                    <span>Mislukt</span>
+                    <Badge variant="destructive" className="ml-auto text-xs">{contentItems.failed.length}</Badge>
+                  </div>
+                  {contentItems.failed.length === 0 ? (
+                    <p className="text-xs text-muted-foreground pl-6">Geen fouten 🎉</p>
+                  ) : contentItems.failed.map(item => (
+                    <div key={item.id} className="pl-6 space-y-0.5">
+                      <p className="text-sm truncate">{item.title || "Zonder titel"}</p>
+                      <p className="text-xs text-destructive/80 truncate">
+                        {item.last_publish_error || "Onbekende fout"}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Quick actions */}
           <div className="grid sm:grid-cols-3 gap-4">
             <Card className="hover:border-primary/30 transition-colors cursor-pointer" onClick={() => navigate("/dashboard/leads")}>
