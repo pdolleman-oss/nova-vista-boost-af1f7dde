@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, Globe, BarChart3, TrendingUp, Loader2, Clock, ArrowRight } from "lucide-react";
+import { Users, Globe, BarChart3, TrendingUp, Loader2, Clock, ArrowRight, CheckCircle2, CalendarClock, AlertTriangle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 interface RecentLead {
   id: string;
@@ -12,9 +13,21 @@ interface RecentLead {
   updated_at: string;
 }
 
+interface ContentItem {
+  id: string;
+  title: string;
+  status: string;
+  publish_channel: string;
+  scheduled_at: string | null;
+  published_at: string | null;
+  updated_at: string | null;
+  last_publish_error: string | null;
+}
+
 const DashboardHome = () => {
   const [stats, setStats] = useState({ leads: 0, audits: 0, pipeline: 0, won: 0 });
   const [recentLeads, setRecentLeads] = useState<RecentLead[]>([]);
+  const [contentItems, setContentItems] = useState<{ published: ContentItem[]; scheduled: ContentItem[]; failed: ContentItem[] }>({ published: [], scheduled: [], failed: [] });
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -54,6 +67,19 @@ const DashboardHome = () => {
           updated_at: r.updated_at,
         }));
       }
+
+      // Fetch content outputs summary
+      const [publishedRes, scheduledRes, failedRes] = await Promise.all([
+        supabase.from("content_outputs").select("id, title, status, publish_channel, scheduled_at, published_at, updated_at, last_publish_error").eq("status", "published").order("published_at", { ascending: false }).limit(3),
+        supabase.from("content_outputs").select("id, title, status, publish_channel, scheduled_at, published_at, updated_at, last_publish_error").eq("status", "scheduled").order("scheduled_at", { ascending: true }).limit(3),
+        supabase.from("content_outputs").select("id, title, status, publish_channel, scheduled_at, published_at, updated_at, last_publish_error").eq("status", "failed").order("updated_at", { ascending: false }).limit(3),
+      ]);
+
+      setContentItems({
+        published: (publishedRes.data || []) as ContentItem[],
+        scheduled: (scheduledRes.data || []) as ContentItem[],
+        failed: (failedRes.data || []) as ContentItem[],
+      });
 
       setStats({
         leads: companiesRes.count || 0,
@@ -151,6 +177,76 @@ const DashboardHome = () => {
                   ))}
                 </div>
               )}
+            </CardContent>
+          </Card>
+
+          {/* Content summary widget */}
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle className="text-lg">Content overzicht</CardTitle>
+              <Button variant="ghost" size="sm" onClick={() => navigate("/dashboard/content/overview")} className="gap-1 text-xs">
+                Bekijk alles <ArrowRight className="w-3 h-3" />
+              </Button>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-4 sm:grid-cols-3">
+                {/* Published */}
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-sm font-medium">
+                    <CheckCircle2 className="w-4 h-4 text-green-500" />
+                    <span>Gepubliceerd</span>
+                    <Badge variant="secondary" className="ml-auto text-xs">{contentItems.published.length}</Badge>
+                  </div>
+                  {contentItems.published.length === 0 ? (
+                    <p className="text-xs text-muted-foreground pl-6">Nog geen publicaties</p>
+                  ) : contentItems.published.map(item => (
+                    <div key={item.id} className="pl-6 space-y-0.5">
+                      <p className="text-sm truncate">{item.title || "Zonder titel"}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {item.published_at ? new Date(item.published_at).toLocaleDateString("nl-NL", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : "—"}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Scheduled */}
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-sm font-medium">
+                    <CalendarClock className="w-4 h-4 text-primary" />
+                    <span>Ingepland</span>
+                    <Badge variant="secondary" className="ml-auto text-xs">{contentItems.scheduled.length}</Badge>
+                  </div>
+                  {contentItems.scheduled.length === 0 ? (
+                    <p className="text-xs text-muted-foreground pl-6">Niets ingepland</p>
+                  ) : contentItems.scheduled.map(item => (
+                    <div key={item.id} className="pl-6 space-y-0.5">
+                      <p className="text-sm truncate">{item.title || "Zonder titel"}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {item.scheduled_at ? new Date(item.scheduled_at).toLocaleDateString("nl-NL", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : "—"}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Failed */}
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-sm font-medium">
+                    <AlertTriangle className="w-4 h-4 text-destructive" />
+                    <span>Mislukt</span>
+                    <Badge variant="destructive" className="ml-auto text-xs">{contentItems.failed.length}</Badge>
+                  </div>
+                  {contentItems.failed.length === 0 ? (
+                    <p className="text-xs text-muted-foreground pl-6">Geen fouten 🎉</p>
+                  ) : contentItems.failed.map(item => (
+                    <div key={item.id} className="pl-6 space-y-0.5">
+                      <p className="text-sm truncate">{item.title || "Zonder titel"}</p>
+                      <p className="text-xs text-destructive/80 truncate">
+                        {item.last_publish_error || "Onbekende fout"}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </CardContent>
           </Card>
 
