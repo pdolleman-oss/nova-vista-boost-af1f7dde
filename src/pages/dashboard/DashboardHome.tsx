@@ -68,6 +68,19 @@ const DashboardHome = () => {
         }));
       }
 
+      // Fetch content outputs summary
+      const [publishedRes, scheduledRes, failedRes] = await Promise.all([
+        supabase.from("content_outputs").select("id, title, status, publish_channel, scheduled_at, published_at, updated_at, last_publish_error").eq("status", "published").order("published_at", { ascending: false }).limit(3),
+        supabase.from("content_outputs").select("id, title, status, publish_channel, scheduled_at, published_at, updated_at, last_publish_error").eq("status", "scheduled").order("scheduled_at", { ascending: true }).limit(3),
+        supabase.from("content_outputs").select("id, title, status, publish_channel, scheduled_at, published_at, updated_at, last_publish_error").eq("status", "failed").order("updated_at", { ascending: false }).limit(3),
+      ]);
+
+      setContentItems({
+        published: (publishedRes.data || []) as ContentItem[],
+        scheduled: (scheduledRes.data || []) as ContentItem[],
+        failed: (failedRes.data || []) as ContentItem[],
+      });
+
       setStats({
         leads: companiesRes.count || 0,
         audits: auditsRes.count || 0,
