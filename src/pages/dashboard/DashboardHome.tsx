@@ -238,7 +238,7 @@ const DashboardHome = () => {
                   {contentItems.failed.length === 0 ? (
                     <p className="text-xs text-muted-foreground pl-6">Geen fouten 🎉</p>
                   ) : contentItems.failed.map(item => (
-                    <div key={item.id} className="pl-6 space-y-0.5">
+                    <div key={item.id} className="pl-6 space-y-0.5 cursor-pointer hover:bg-secondary/30 rounded p-1 -ml-1" onClick={() => navigate("/dashboard/content", { state: { highlightId: item.id } })}>
                       <p className="text-sm truncate">{item.title || "Zonder titel"}</p>
                       <p className="text-xs text-destructive/80 truncate">
                         {item.last_publish_error || "Onbekende fout"}
