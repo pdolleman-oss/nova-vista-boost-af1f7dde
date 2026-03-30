@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, Globe, BarChart3, TrendingUp, Loader2, Clock, ArrowRight } from "lucide-react";
+import { Users, Globe, BarChart3, TrendingUp, Loader2, Clock, ArrowRight, CheckCircle2, CalendarClock, AlertTriangle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 interface RecentLead {
   id: string;
