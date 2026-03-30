@@ -13,9 +13,21 @@ interface RecentLead {
   updated_at: string;
 }
 
+interface ContentItem {
+  id: string;
+  title: string;
+  status: string;
+  publish_channel: string;
+  scheduled_at: string | null;
+  published_at: string | null;
+  updated_at: string | null;
+  last_publish_error: string | null;
+}
+
 const DashboardHome = () => {
   const [stats, setStats] = useState({ leads: 0, audits: 0, pipeline: 0, won: 0 });
   const [recentLeads, setRecentLeads] = useState<RecentLead[]>([]);
+  const [contentItems, setContentItems] = useState<{ published: ContentItem[]; scheduled: ContentItem[]; failed: ContentItem[] }>({ published: [], scheduled: [], failed: [] });
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
