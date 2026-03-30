@@ -200,7 +200,7 @@ const DashboardHome = () => {
                   {contentItems.published.length === 0 ? (
                     <p className="text-xs text-muted-foreground pl-6">Nog geen publicaties</p>
                   ) : contentItems.published.map(item => (
-                    <div key={item.id} className="pl-6 space-y-0.5">
+                    <div key={item.id} className="pl-6 space-y-0.5 cursor-pointer hover:bg-secondary/30 rounded p-1 -ml-1" onClick={() => navigate("/dashboard/content", { state: { highlightId: item.id } })}>
                       <p className="text-sm truncate">{item.title || "Zonder titel"}</p>
                       <p className="text-xs text-muted-foreground">
                         {item.published_at ? new Date(item.published_at).toLocaleDateString("nl-NL", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : "—"}
