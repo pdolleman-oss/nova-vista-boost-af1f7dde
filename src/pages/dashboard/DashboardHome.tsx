@@ -95,6 +95,43 @@ const DashboardHome = () => {
         failed: (failedRes.data || []) as ContentItem[],
       });
 
+      // Fetch social connections + latest health checks
+      const { data: connections } = await supabase
+        .from("social_connections")
+        .select("id, channel, page_name, is_active, is_test_connection, last_validated_at, last_validation_status, last_error_message")
+        .eq("user_id", user.id)
+        .eq("is_active", true)
+        .order("connected_at", { ascending: false });
+
+      let healthItems: SocialHealthItem[] = [];
+      if (connections && connections.length > 0) {
+        const connIds = connections.map(c => c.id);
+        const { data: checks } = await supabase
+          .from("social_health_checks")
+          .select("connection_id, status, checked_at")
+          .in("connection_id", connIds)
+          .order("checked_at", { ascending: false });
+        const latestCheck = new Map<string, { status: string; checked_at: string }>();
+        (checks || []).forEach(c => {
+          if (c.connection_id && !latestCheck.has(c.connection_id)) {
+            latestCheck.set(c.connection_id, { status: c.status, checked_at: c.checked_at });
+          }
+        });
+        healthItems = connections.map(c => ({
+          id: c.id,
+          channel: c.channel,
+          page_name: c.page_name,
+          is_active: c.is_active,
+          is_test_connection: c.is_test_connection,
+          last_validated_at: c.last_validated_at,
+          last_validation_status: c.last_validation_status,
+          last_error_message: c.last_error_message,
+          last_check_status: latestCheck.get(c.id)?.status || null,
+          last_check_at: latestCheck.get(c.id)?.checked_at || null,
+        }));
+      }
+      setSocialHealth(healthItems);
+
       setStats({
         leads: companiesRes.count || 0,
         audits: auditsRes.count || 0,
