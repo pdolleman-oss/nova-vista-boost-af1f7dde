@@ -308,7 +308,7 @@ const DashboardHome = () => {
                 <Activity className="w-5 h-5 text-primary" />
                 Social status
               </CardTitle>
-              <Button variant="ghost" size="sm" onClick={() => navigate("/dashboard/social-health")} className="gap-1 text-xs">
+              <Button variant="ghost" size="sm" onClick={() => navigate("/dashboard/social/health")} className="gap-1 text-xs">
                 Bekijk alles <ArrowRight className="w-3 h-3" />
               </Button>
             </CardHeader>
@@ -317,7 +317,7 @@ const DashboardHome = () => {
                 <div className="text-center py-6 space-y-3">
                   <Wifi className="w-8 h-8 text-muted-foreground mx-auto" />
                   <p className="text-sm text-muted-foreground">Nog geen actieve social koppelingen.</p>
-                  <Button size="sm" onClick={() => navigate("/dashboard/social-publisher")}>
+                  <Button size="sm" onClick={() => navigate("/dashboard/social")}>
                     Koppel een pagina
                   </Button>
                 </div>
@@ -334,7 +334,7 @@ const DashboardHome = () => {
                       <div
                         key={item.id}
                         className="flex items-center justify-between p-3 rounded-lg bg-secondary/30 cursor-pointer hover:bg-secondary/50 transition-colors"
-                        onClick={() => navigate("/dashboard/social-health")}
+                        onClick={() => navigate(`/dashboard/social/health/${item.id}`)}
                       >
                         <div className="flex items-center gap-3 min-w-0">
                           <Icon className={`w-5 h-5 shrink-0 ${iconClass}`} />
