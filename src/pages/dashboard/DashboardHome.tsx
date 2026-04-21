@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, Globe, BarChart3, TrendingUp, Loader2, Clock, ArrowRight, CheckCircle2, CalendarClock, AlertTriangle } from "lucide-react";
+import { Users, Globe, BarChart3, TrendingUp, Loader2, Clock, ArrowRight, CheckCircle2, CalendarClock, AlertTriangle, Wifi, XCircle, Activity } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -24,10 +24,24 @@ interface ContentItem {
   last_publish_error: string | null;
 }
 
+interface SocialHealthItem {
+  id: string;
+  channel: string;
+  page_name: string;
+  is_active: boolean;
+  is_test_connection: boolean;
+  last_validated_at: string | null;
+  last_validation_status: string | null;
+  last_error_message: string | null;
+  last_check_status: string | null;
+  last_check_at: string | null;
+}
+
 const DashboardHome = () => {
   const [stats, setStats] = useState({ leads: 0, audits: 0, pipeline: 0, won: 0 });
   const [recentLeads, setRecentLeads] = useState<RecentLead[]>([]);
   const [contentItems, setContentItems] = useState<{ published: ContentItem[]; scheduled: ContentItem[]; failed: ContentItem[] }>({ published: [], scheduled: [], failed: [] });
+  const [socialHealth, setSocialHealth] = useState<SocialHealthItem[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -80,6 +94,43 @@ const DashboardHome = () => {
         scheduled: (scheduledRes.data || []) as ContentItem[],
         failed: (failedRes.data || []) as ContentItem[],
       });
+
+      // Fetch social connections + latest health checks
+      const { data: connections } = await supabase
+        .from("social_connections")
+        .select("id, channel, page_name, is_active, is_test_connection, last_validated_at, last_validation_status, last_error_message")
+        .eq("user_id", user.id)
+        .eq("is_active", true)
+        .order("connected_at", { ascending: false });
+
+      let healthItems: SocialHealthItem[] = [];
+      if (connections && connections.length > 0) {
+        const connIds = connections.map(c => c.id);
+        const { data: checks } = await supabase
+          .from("social_health_checks")
+          .select("connection_id, status, checked_at")
+          .in("connection_id", connIds)
+          .order("checked_at", { ascending: false });
+        const latestCheck = new Map<string, { status: string; checked_at: string }>();
+        (checks || []).forEach(c => {
+          if (c.connection_id && !latestCheck.has(c.connection_id)) {
+            latestCheck.set(c.connection_id, { status: c.status, checked_at: c.checked_at });
+          }
+        });
+        healthItems = connections.map(c => ({
+          id: c.id,
+          channel: c.channel,
+          page_name: c.page_name,
+          is_active: c.is_active,
+          is_test_connection: c.is_test_connection,
+          last_validated_at: c.last_validated_at,
+          last_validation_status: c.last_validation_status,
+          last_error_message: c.last_error_message,
+          last_check_status: latestCheck.get(c.id)?.status || null,
+          last_check_at: latestCheck.get(c.id)?.checked_at || null,
+        }));
+      }
+      setSocialHealth(healthItems);
 
       setStats({
         leads: companiesRes.count || 0,
@@ -247,6 +298,74 @@ const DashboardHome = () => {
                   ))}
                 </div>
               </div>
+            </CardContent>
+          </Card>
+
+          {/* Social health summary widget */}
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Activity className="w-5 h-5 text-primary" />
+                Social status
+              </CardTitle>
+              <Button variant="ghost" size="sm" onClick={() => navigate("/dashboard/social-health")} className="gap-1 text-xs">
+                Bekijk alles <ArrowRight className="w-3 h-3" />
+              </Button>
+            </CardHeader>
+            <CardContent>
+              {socialHealth.length === 0 ? (
+                <div className="text-center py-6 space-y-3">
+                  <Wifi className="w-8 h-8 text-muted-foreground mx-auto" />
+                  <p className="text-sm text-muted-foreground">Nog geen actieve social koppelingen.</p>
+                  <Button size="sm" onClick={() => navigate("/dashboard/social-publisher")}>
+                    Koppel een pagina
+                  </Button>
+                </div>
+              ) : (
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {socialHealth.map(item => {
+                    const status = item.last_check_status || item.last_validation_status || "unknown";
+                    const isHealthy = status === "healthy" || status === "success";
+                    const isDegraded = status === "degraded" || status === "warning";
+                    const Icon = isHealthy ? CheckCircle2 : isDegraded ? AlertTriangle : XCircle;
+                    const iconClass = isHealthy ? "text-green-500" : isDegraded ? "text-yellow-500" : "text-destructive";
+                    const checkedAt = item.last_check_at || item.last_validated_at;
+                    return (
+                      <div
+                        key={item.id}
+                        className="flex items-center justify-between p-3 rounded-lg bg-secondary/30 cursor-pointer hover:bg-secondary/50 transition-colors"
+                        onClick={() => navigate("/dashboard/social-health")}
+                      >
+                        <div className="flex items-center gap-3 min-w-0">
+                          <Icon className={`w-5 h-5 shrink-0 ${iconClass}`} />
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2">
+                              <p className="font-medium text-sm truncate">{item.page_name || "Onbekende pagina"}</p>
+                              {item.is_test_connection && (
+                                <Badge variant="outline" className="text-[10px] px-1.5 py-0">Test</Badge>
+                              )}
+                            </div>
+                            <p className="text-xs text-muted-foreground capitalize">
+                              {item.channel} · {checkedAt
+                                ? new Date(checkedAt).toLocaleDateString("nl-NL", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })
+                                : "Nooit gecontroleerd"}
+                            </p>
+                            {item.last_error_message && !isHealthy && (
+                              <p className="text-xs text-destructive/80 truncate mt-0.5">{item.last_error_message}</p>
+                            )}
+                          </div>
+                        </div>
+                        <Badge
+                          variant={isHealthy ? "secondary" : isDegraded ? "outline" : "destructive"}
+                          className="text-[10px] shrink-0"
+                        >
+                          {isHealthy ? "Gezond" : isDegraded ? "Beperkt" : status === "unknown" ? "Onbekend" : "Fout"}
+                        </Badge>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </CardContent>
           </Card>
 
