@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, Globe, BarChart3, TrendingUp, Loader2, Clock, ArrowRight, CheckCircle2, CalendarClock, AlertTriangle } from "lucide-react";
+import { Users, Globe, BarChart3, TrendingUp, Loader2, Clock, ArrowRight, CheckCircle2, CalendarClock, AlertTriangle, Wifi, XCircle, Activity } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -24,10 +24,24 @@ interface ContentItem {
   last_publish_error: string | null;
 }
 
+interface SocialHealthItem {
+  id: string;
+  channel: string;
+  page_name: string;
+  is_active: boolean;
+  is_test_connection: boolean;
+  last_validated_at: string | null;
+  last_validation_status: string | null;
+  last_error_message: string | null;
+  last_check_status: string | null;
+  last_check_at: string | null;
+}
+
 const DashboardHome = () => {
   const [stats, setStats] = useState({ leads: 0, audits: 0, pipeline: 0, won: 0 });
   const [recentLeads, setRecentLeads] = useState<RecentLead[]>([]);
   const [contentItems, setContentItems] = useState<{ published: ContentItem[]; scheduled: ContentItem[]; failed: ContentItem[] }>({ published: [], scheduled: [], failed: [] });
+  const [socialHealth, setSocialHealth] = useState<SocialHealthItem[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
