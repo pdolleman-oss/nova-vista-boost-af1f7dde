@@ -80,7 +80,25 @@ Baseer je analyse op wat je weet over het domein. Geef realistische schattingen.
 
     if (!aiResponse.ok) {
       const errText = await aiResponse.text();
-      throw new Error(`AI API error: ${aiResponse.status} - ${errText}`);
+      console.error("AI API error:", aiResponse.status, errText);
+      const isPayment = aiResponse.status === 402;
+      const isRate = aiResponse.status === 429;
+      return new Response(
+        JSON.stringify({
+          error: isPayment
+            ? "PAYMENT_REQUIRED"
+            : isRate
+            ? "RATE_LIMITED"
+            : `AI API error: ${aiResponse.status}`,
+          message: isPayment
+            ? "Er zijn onvoldoende AI-credits beschikbaar om deze analyse uit te voeren."
+            : isRate
+            ? "Te veel verzoeken. Probeer het later opnieuw."
+            : "De AI-service is tijdelijk niet beschikbaar.",
+          fallback: true,
+        }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
     }
 
     const aiData = await aiResponse.json();
@@ -144,8 +162,10 @@ Baseer je analyse op wat je weet over het domein. Geef realistische schattingen.
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error: any) {
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    console.error("analyze-website unexpected error:", error);
+    return new Response(
+      JSON.stringify({ error: "SERVICE_FAILED", message: error?.message || "Onbekende fout", fallback: true }),
+      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+    );
   }
 });
