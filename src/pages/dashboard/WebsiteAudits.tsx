@@ -77,9 +77,13 @@ const WebsiteAudits = () => {
 
       if (fnError) throw fnError;
 
-      toast.success("Website analyse voltooid!");
-      setUrl("");
-      loadAudits();
+      if (result?.fallback || result?.error) {
+        toast.error(result.message || "AI-analyse mislukt: " + result.error);
+      } else {
+        toast.success("Website analyse voltooid!");
+        setUrl("");
+        loadAudits();
+      }
     } catch (err: any) {
       toast.error("Scan mislukt: " + (err.message || "Onbekende fout"));
     } finally {
