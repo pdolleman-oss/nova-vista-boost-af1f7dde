@@ -1,77 +1,192 @@
-# Nova Vista Progressus — herpositionering naar uitvoeringsplatform
+# Read-only audit: AIdiensten.com
 
-Het bestaande platform (leads, content, social, audits, academy) blijft de basis. We bouwen er de Nova Vista-strategie bovenop: Bedrijfsscan → verbeterproject → uitvoering, met duidelijke modules, campagnebouwer, klantportaal en interne bureau-modus.
+**Status:** uitsluitend geanalyseerd. Er is niets gewijzigd of gepubliceerd.
 
-## Uitgangspunten
+## Afbakening en belangrijkste constatering
 
-- Alles Nederlands, mobiel-eerst.
-- Nachtblauw + cosmic latte + subtiel goud (bestaand donkerblauw thema wordt hierop bijgesteld; cyaan/turkoois maakt plaats voor cosmic latte + goud).
-- Slogan: "Vooruitgang door nieuwe visie". Zakelijk, geen AI-hype.
-- Alle commerciële links wijzen naar één centrale hoofdsite: https://aidiensten.com.
-- Demonstratiegegevens worden altijd zichtbaar gelabeld als demo. Geen knop die belooft te mailen of te publiceren als de koppeling niet echt bestaat.
-- Geen verzonnen prijzen, resultaten of klantverhalen.
+Er zijn twee verschillende producten onderzocht:
 
-## Wat er verandert
+1. **Dit NVB-project** (`nova-vista-boost.lovable.app`): een React-klantportaal met één openbare marketingpagina en verder login/dashboardroutes.
+2. **AIdiensten.com**: stuurt permanent door naar `https://novavistaprogressus.nl`. De publiek vindbare website staat dus niet in deze repository.
 
-### 1. Merk en voorkant
-- Naam, slogan, kleuren en teksten door de hele voorkant en het portaal.
-- Startpagina herschreven rond het doelmodel: scan → uitvoering → keuze uit drie routes.
-- Drie zakelijke routes vervangen de oude tariefopzet: "Zelf doen met AI-tools", "Samen met Nova Vista", "Volledig laten uitvoeren", plus losse projecten (website, campagne, automatisering, funnel, branding, video). Bedragen alleen waar we ze echt kennen; anders "Vraag voorstel aan", "Start met Bedrijfsscan", "Plan intake".
+Daardoor kunnen wijzigingen in dit NVB-project AIdiensten.com niet beter laten ranken zolang DNS/hosting en de 301-doorverwijzing naar de andere website ongewijzigd blijven.
 
-### 2. Dashboard
-Nieuw klantdashboard met doelen, lopende projecten, campagnes, taken, contentkalender, leads en kern-KPI's — en bovenaan het blok "Aanbevolen vanuit Bedrijfsscan" waarmee een kans met één klik een verbeterproject wordt. Bestaande content- en social-widgets blijven, maar krijgen een plek lager op de pagina.
+## 1. Bestaande pagina's en routes
 
-### 3. Diensten/modules
-Overzichtspagina met elf modules: marketingstrategie, SEO & content, social media, e-mailmarketing, leadgeneratie & funnel, websites & landingspagina's, webshops/productcontent, branding, video & creatives, AI-automatisering, rapportage. Elke module heeft een eigen pagina die tot een concrete uitkomst leidt (bijvoorbeeld een strategie-overzicht, contentplan of scriptset) en verwijst naar de bestaande werkende onderdelen waar die al bestaan.
+### Huidige NVB-code
 
-### 4. Campagnebouwer
-Stappenflow: doel → doelgroep → aanbod → kanaal → boodschap → assets → planning → KPI's → goedkeuring → uitvoeren. Zes startsjablonen: B2B-leadgeneratie, lokale dienstverlener, webshop/productlancering, high-ticket sales, retentie, reactivatie. Publiceren gebeurt alleen via de al werkende social-koppeling; anders wordt de campagne als taak klaargezet.
+Openbaar:
+- `/` — algemene Nova Vista Boost-landingspagina
+- `/auth` — inloggen/registreren
+- `/reset-password` — wachtwoordherstel
+- `*` — 404
 
-### 5. Content-engine
-De bestaande Content Studio wordt uitgebreid met merkprofiel/tone of voice, contentpijlers en meer soorten output (blog, nieuwsbrief, advertentiecopy, landingspaginatekst, productbeschrijving, videoscript, CTA-varianten). Eén bron kan naar meerdere kanalen worden hergebruikt. Goedkeuringsstappen: concept → review → akkoord → gepland/gepubliceerd.
+Achter login onder `/dashboard`:
+- `/dashboard`
+- `/dashboard/leads`
+- `/dashboard/pipeline`
+- `/dashboard/audits`
+- `/dashboard/ai-tools`
+- `/dashboard/social`
+- `/dashboard/social/health`
+- `/dashboard/social/health/:connectionId`
+- `/dashboard/publish-settings`
+- `/dashboard/content`
+- `/dashboard/content/overview`
+- `/dashboard/academy`
+- `/dashboard/settings`
+- `/dashboard/users`
 
-### 6. Leads & sales
-De bestaande pijplijn krijgt de statussen nieuw → gekwalificeerd → voorstel → onderhandeling → gewonnen/verloren, plus bron, waarde en volgende actie. Opvolgvoorstellen en herinneringen worden als voorstel getoond, niet automatisch verstuurd. Voorstelgenerator als duidelijk gemarkeerde placeholder.
+Bron: `src/App.tsx:33-52`.
 
-### 7. Bedrijfsscan-integratie
-Een aparte laag die scanresultaten inleest, met een voorbeeldscan (leadopvolging, SEO-content, e-mailtriage). Elke kans heeft "Start verbeterproject". README beschrijft hoe dit later echt gekoppeld wordt aan de scan-omgeving.
+### Live website waar AIdiensten.com naartoe verwijst
 
-### 8. Klantportaal
-Projecten met status, bestanden/assets (placeholder), goedkeuringen, berichten/notities, maandrapport. Facturen/betalingen als toekomstige placeholder, geen nepbetalingen.
+In sitemap en navigatie bevestigd:
+- `/`
+- `/ai-training-bedrijven`
+- `/ai-bedrijfsscan`
+- `/boeken/onder-de-motorkap-van-chatgpt`
+- `/boeken/onder-de-motorkap-van-chatgpt/feedback`
+- `/tarieven`
+- `/over-mij`
+- `/contact`
+- `/privacy`
+- `/voorwaarden`
 
-### 9. Automatisering
-Koppelingenoverzicht met drie duidelijke statussen: actief, demo, toekomstig — voor Gmail, Drive, Agenda, social scheduling, analytics, Stripe en website/CMS.
+Niet aanwezig (404):
+- `/quickscan`
+- `/ai-advies-mkb`
+- `/ai-implementatie-mkb`
 
-### 10. Interne bureau-modus
-Eén werkscherm voor het team: klanten, openstaande acties, leads, campagnes in review, content die op akkoord wacht, maandrapportages en upsell-kansen uit de scan.
+## 2. Technische SEO
 
-### 11. Opruimen
-Verouderde en dubbele pagina's verdwijnen of worden samengevoegd (o.a. de losse social-subpagina's gaan onder één Social-module; Academy blijft als interne kennisbank). Navigatie wordt gegroepeerd: Werk, Modules, Klanten, Beheer.
+### Live website: sterke basis
 
-## Technische aanpak
+- Server-rendered Nederlandstalige HTML; inhoud is zonder JavaScript leesbaar.
+- Homepage heeft één H1: **“AI die werkt binnen uw organisatie.”**
+- Unieke titles/descriptions/canonicals op de onderzochte pagina's.
+- `robots.txt` staat crawlen toe en verwijst naar de sitemap.
+- `sitemap.xml` bevat tien openbare URL's.
+- Organization-schema is aanwezig; de bedrijfsscan heeft aanvullend Service + Offer (€495) schema.
+- Goede interne hoofdnavigatie naar training, bedrijfsscan, boek, tarieven, over en contact.
 
-- Nieuwe map `src/config/` met `brand.ts` (naam, slogan, MAIN_SITE_URL, kleuren) en `pricing.ts` (drie routes + losse projecten, zonder verzonnen bedragen).
-- Nieuwe map `src/domain/` met losse modellen en types voor client, project, campaign, content, lead, report — gescheiden van de UI, zodat later een echte database of API eronder past.
-- Nieuwe map `src/services/scan/` met een `ScanProvider`-interface plus een demo-provider met de voorbeeldscan; later te vervangen door een echte API/MCP-koppeling.
-- Nieuwe map `src/data/demo/` voor alle demonstratiegegevens, altijd via een `DemoBadge`-component gelabeld.
-- Databasewerk: nieuwe tabellen voor `campaigns`, `campaign_steps`, `projects`-uitbreiding, `scan_opportunities`, `brand_profiles`, `content_pillars`, `client_messages`, `client_files`, `monthly_reports` — met toegangsregels per gebruiker/organisatie en de bestaande rolstructuur (admin, eigenaar, teamlid).
-- Bestaande edge functions (`content-engine`, `social-publish`, `social-health`, `nvb-ai-run`) blijven; de campagnebouwer en modules hergebruiken ze in plaats van nieuwe AI-routes te maken.
-- Kleuren/tokens in `src/index.css` en `tailwind.config.ts` bijgewerkt naar nachtblauw/cosmic latte/goud; geen vaste kleurcodes in componenten.
-- README krijgt de productie-roadmap: database/auth, rollen, Stripe, e-mail, social connectors, analytics, goedkeuringen, audit log, AVG/dataretentie, en de scan-koppeling.
+### Live website: zwakke punten
 
-## Uitvoering in fasen
+- `aidiensten.com` is geen indexeerbare hoofdsite: HTTP/HTTPS en www verwijzen met 301 naar `novavistaprogressus.nl`. Canonicals en schema noemen eveneens alleen Nova Vista Progressus. Zoekmachines zullen daarom de bestemmingssite indexeren, niet AIdiensten.com.
+- Rechtstreeks HTTPS-opvragen van AIdiensten.com gaf in deze audit een certificaatnaam-mismatch; na omzeilen volgde alsnog de 301. Dit verdient hosting/DNS-controle.
+- Er zijn geen afzonderlijke landingspagina's voor **AI advies MKB** en **AI implementatie MKB**; beide routes geven 404.
+- De H1 van de bedrijfsscan bevat het hoofdzoekwoord niet letterlijk. De title en body doen dat wel, maar de H1 **“Waar kan AI binnen uw organisatie werkelijk renderen?”** is minder expliciet.
+- De tarievenpagina richt title en H1 primair op AI-websites, niet op scan → advies → implementatie.
 
-1. Merk, kleuren, config, domeinmodellen, navigatie en opruimen.
-2. Bedrijfsscan-laag + nieuw dashboard met "Aanbevolen vanuit Bedrijfsscan".
-3. Modules-overzicht en modulepagina's.
-4. Campagnebouwer met sjablonen (incl. database).
-5. Content-engine uitbreiding (merkprofiel, pijlers, hergebruik).
-6. Leads & sales aanscherping.
-7. Klantportaal, automatiseringsoverzicht, interne bureau-modus.
-8. README-roadmap en test van de hoofdflow op desktop en mobiel.
+### NVB-project: niet geschikt als huidige SEO-voorkant
 
-## Aannames
+- `index.html:2` heeft `lang="en"` terwijl de inhoud Nederlands is.
+- Metadata en canonical positioneren “Nova Vista Boost / AI Marketing” en wijzen naar het Lovable-domein (`index.html:8-27`), niet naar AIdiensten.com.
+- Geen `public/robots.txt`, `public/sitemap.xml` of JSON-LD.
+- Eén generieke openbare pagina; geen indexeerbare dienstpagina's.
+- Interne links leiden vrijwel uitsluitend naar `/auth`; de footer heeft geen inhoudelijke navigatie (`src/components/Navbar.tsx`, `src/components/Footer.tsx`).
+- De H1 **“Versnel je groei met AI Marketing”** en vaste SaaS-prijzen (€49/€149/€399) sluiten niet aan op bedrijfsscan/advies/implementatie (`src/pages/Index.tsx:17-45,57-72`).
 
-- De Bedrijfsscan heeft nu nog geen API; we bouwen de laag met een demo-provider en een duidelijk koppelpunt.
-- Er zijn geen bekende bedragen, dus overal "Vraag voorstel aan" of "Plan intake" in plaats van prijzen.
-- Betalingen/facturatie blijven placeholder; de bestaande Mollie-functies blijven ongebruikt in de nieuwe voorkant tot je ze wilt activeren.
+Er zijn geen actuele opgeslagen SEO-scans beschikbaar voor dit project; alle scanners staan op `not_scanned`. De conclusies hierboven komen uit broncode en live HTTP/HTML-controle.
+
+## 3. AI-vindbaarheid en entity-signalen
+
+### Goed
+
+- De live site levert volledige HTML aan crawlers.
+- `/llms.txt` bestaat en benoemt organisatie, auteur, diensten, €495-scan en menselijke controle.
+- Organization- en Service-schema koppelen Nova Vista Progressus, Pascal Dolleman, Nederland en de AI-bedrijfsscan.
+- De teksten bevatten nuttige entiteiten: Customer Service, Sales, Marketing, managementregie, menselijke controle, privacy, automatisering en training.
+
+### Onvoldoende
+
+- **AIdiensten.com** bouwt zelf geen entity-signaal op door de 301 en canonicals naar Nova Vista Progressus. Als AIdiensten.com het commerciële merk/domein moet worden, is dit de grootste inconsistentie.
+- “MKB” komt niet prominent genoeg terug in titles/H1's en de scanpagina sluit zzp/kleine bedrijven expliciet uit. Dat botst met zoekintentie rond “AI advies MKB”. Segmentatie is nodig: quickscan voor klein MKB, volledige scan voor organisaties met structurele afdelingen.
+- Er ontbreken zelfstandige, citeerbare pagina's voor advies en implementatie met duidelijke definities, aanpak, deliverables, KPI's, AI Act/AVG, pilot en borging.
+- De actuele expertise is vooral servicecopy. Er is weinig ondersteunende kennisinhoud rond selectie van use-cases, ROI-inschatting, implementatiestappen en governance waarmee zoekmachines en LLM's de expertise breder kunnen verifiëren.
+
+## 4. Funnel-audit
+
+Gewenste route:
+
+```text
+Gratis Quickscan → volledige AI-bedrijfsscan €495 → implementatie en/of training
+```
+
+Werkelijke route:
+
+```text
+Algemene homepage → bedrijfsscanpagina → gratis intake per mailto-link → €495 opdracht
+                                            ↘ trainingpagina als losse navigatieroute
+```
+
+- Er is **geen gratis Quickscan** of `/quickscan`; alleen een gratis intake zonder analyse of advies.
+- De betaalde bedrijfsscan is inhoudelijk helder: €495 excl. btw, maximaal drie afdelingen en vijftien deelnemers, menselijke beoordeling.
+- Op de scanpagina ontbreekt een concrete vervolgstap na de prioriteitenlijst, zoals “laat kans 1 implementeren” of “plan teamtraining”.
+- De trainingpagina noemt scan, implementatie en borging, maar is geen gerichte bottom-of-funnel pagina voor “AI implementatie MKB”.
+- De CTA voor de scan opent een vooraf ingevulde e-mail. Er is geen ingebed intakeformulier, directe bevestiging, planning of meetbare conversiestap.
+- Het contactformulier opent eveneens het lokale e-mailprogramma en slaat niets op. Dit faalt voor bezoekers zonder goed ingesteld mailprogramma en maakt funnelmeting beperkt.
+
+## 5. Belangrijkste conversielekken
+
+1. **Domein-/merkverlies:** bezoekers en zoekwaarde eindigen op novavistaprogressus.nl; AIdiensten.com kan geen zelfstandige commerciële autoriteit opbouwen.
+2. **Ontbrekende gratis Quickscan:** de beloofde laagdrempelige eerste stap bestaat niet; “gratis intake” heeft een hogere ervaren inspanning en levert geen direct resultaat.
+3. **Geen doorlopende offer ladder:** €495-scan heeft geen expliciete, directe vervolg-CTA naar implementatie of training op basis van de uitkomst.
+4. **Mailto als conversiemechanisme:** afhankelijk van lokale mailsoftware, geen betrouwbare ontvangstbevestiging en beperkt meetbaar.
+5. **Ontbrekende intentiepagina's:** “AI advies MKB” en “AI implementatie MKB” landen op 404 en kunnen niet ranken of converteren.
+6. **Doelgroepfrictie:** bedrijfsscan is voor middelgrote/grotere organisaties; de gewenste MKB-termen omvatten ook kleinere bedrijven. Zonder duidelijke segmentkeuze kan verkeer afhaken.
+7. **Tarievenverwarring:** `/tarieven` gaat vooral over websites, terwijl bezoekers vanuit scan/advies een prijs- en vervolgoverzicht voor AI-dienstverlening verwachten.
+
+## Exact de 5 wijzigingen met hoogste verwacht rendement
+
+### 1. Kies AIdiensten.com als echte, canonieke commerciële hoofdsite
+
+**Waarom hoogste rendement:** lost in één keer merk-, indexatie-, canonical- en vertrouwensfragmentatie op. Nu draagt AIdiensten.com alle organische waarde over aan een ander domein.
+
+**Gewenste wijziging:** serveer de website op AIdiensten.com met geldig TLS; zet alle self-referencing canonicals, sitemap, robots, schema en interne absolute URL's op dat domein. Redirect juist het oude domein per overeenkomstige route naar AIdiensten.com, niet alles naar de homepage.
+
+**Geraakte live routes/bestanden:** hosting/DNS/TLS; globale metadata/layout; `/robots.txt`; `/sitemap.xml`; `/llms.txt`; alle canonicals en Organization/Service-schema's. Deze live-sitebestanden zitten **niet in de huidige NVB-repository**.
+
+### 2. Bouw een echte gratis Quickscan als primaire instap
+
+**Waarom:** sluit direct aan op de Nederlandse “AI bedrijfsscan”-intentie: snel inzicht, lage drempel, concrete kansen. Het creëert de ontbrekende bovenkant van de funnel.
+
+**Gewenste wijziging:** nieuwe `/quickscan` met 8–12 zakelijke vragen, directe korte uitslag (volwassenheid + 3 kansgebieden), e-mailrapport en één duidelijke vervolgstap naar de €495-scan. Benoem expliciet dat het een indicatie is en menselijke beoordeling pas in de volledige scan volgt.
+
+**Geraakte live routes/bestanden:** nieuwe `/quickscan`; CTA's op `/`, `/ai-bedrijfsscan`, `/contact`; formulierverwerking/CRM en bedankpagina; sitemap; schema. Niet aanwezig in deze NVB-repository.
+
+### 3. Maak één expliciete offer-ladder op de bedrijfsscanpagina
+
+**Waarom:** verkleint het grootste commerciële gat tussen diagnose en omzet uit uitvoering.
+
+**Gewenste wijziging:** positioneer op `/ai-bedrijfsscan` drie duidelijk gekoppelde stappen: gratis Quickscan → bedrijfsscan €495 → gekozen implementatie/training. Voeg onder “Wat ontvangt uw organisatie?” concrete deliverables toe (prioriteitenmatrix, risico/randvoorwaarden, aanbevolen pilot, besluitgesprek) en twee vervolg-CTA's: “Start volledige scan” en “Bespreek implementatie”.
+
+**Geraakte live routes/bestanden:** `/ai-bedrijfsscan`; gedeelde CTA/component; `/contact` met bron/aanbod vooraf geselecteerd; Service/Offer-schema en interne links. Niet aanwezig in deze NVB-repository.
+
+### 4. Voeg aparte pagina's toe voor “AI advies MKB” en “AI implementatie MKB”
+
+**Waarom:** de twee belangrijkste midden- en onderkantzoekintenties hebben nu geen landingspagina. Concurrenten beantwoorden deze intenties met roadmaps, pilots, KPI's, integraties en governance.
+
+**Gewenste wijziging:** 
+- `/ai-advies-mkb`: use-caseprioritering, ROI-inschatting, roadmap, AVG/AI Act, managementbesluit, deliverables en CTA naar adviesgesprek/scan.
+- `/ai-implementatie-mkb`: pilot → integratie → training → menselijke controle → KPI-meting → borging, met concrete systemen/voorbeelden waar aantoonbaar.
+
+**Geraakte live routes/bestanden:** twee nieuwe routes; homepage/nav/footer; `/ai-bedrijfsscan`; `/ai-training-bedrijven`; sitemap; BreadcrumbList + Service-schema; interne links. Niet aanwezig in deze NVB-repository.
+
+### 5. Vervang mailto-conversies door een meetbaar intakepad
+
+**Waarom:** verbetert direct de voltooiingskans en maakt zichtbaar waar bezoekers uitvallen.
+
+**Gewenste wijziging:** ingebed formulier met maximaal vijf eerste velden, server-side verzending/opslag, duidelijke privacytekst, bevestigingspagina en bronvelden (`quickscan`, `bedrijfsscan`, `advies`, `implementatie`, `training`). Laat daarna een intake plannen of terugbelmoment kiezen. Meet minimaal CTA-click, formulierstart, formulierverzending en geboekte intake.
+
+**Geraakte live routes/bestanden:** `/contact`; `/ai-bedrijfsscan`; `/ai-training-bedrijven`; nieuwe bedank-/planroute; formulierhandler en analytics-events. Niet aanwezig in deze NVB-repository.
+
+## Rendementsvolgorde
+
+1. Canoniek domein en TLS
+2. Gratis Quickscan
+3. Offer-ladder op de scanpagina
+4. Advies- en implementatiepagina's
+5. Meetbare formulieren en opvolging
+
+Eerst domein/canonical oplossen; anders bouwen de overige verbeteringen autoriteit op voor het verkeerde domein.
