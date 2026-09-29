@@ -1,47 +1,18 @@
-# Read-only audit: AIdiensten.com
+# Technische indexeerbaarheidsaudit — Nova Vista Progressus
 
-**Status:** uitsluitend geanalyseerd. Er is niets gewijzigd of gepubliceerd.
+**Status:** read-only gecontroleerd op 29 september 2026. Niets gewijzigd of gepubliceerd.
 
-## Afbakening en belangrijkste constatering
+## Afbakening
 
-Er zijn twee verschillende producten onderzocht:
+- `https://novavistaprogressus.nl` is bewust de canonieke productie-site.
+- `aidiensten.com`, `www.aidiensten.com` en HTTP verwijzen permanent (301) naar `https://novavistaprogressus.nl`.
+- De productie-site staat niet in deze NVB-repository. Dit project draait apart op `nova-vista-boost.lovable.app` als klantportaal/demo.
+- Er is geen Search Console-koppeling beschikbaar in dit project. Werkelijke Google-indexstatus, vertoningen en crawldatum zijn daarom **onbekend**; broncode en live HTTP-resultaten bewijzen alleen technische indexeerbaarheid.
 
-1. **Dit NVB-project** (`nova-vista-boost.lovable.app`): een React-klantportaal met één openbare marketingpagina en verder login/dashboardroutes.
-2. **AIdiensten.com**: stuurt permanent door naar `https://novavistaprogressus.nl`. De publiek vindbare website staat dus niet in deze repository.
+## Publieke productieroutes
 
-Daardoor kunnen wijzigingen in dit NVB-project AIdiensten.com niet beter laten ranken zolang DNS/hosting en de 301-doorverwijzing naar de andere website ongewijzigd blijven.
+Deze tien routes staan in de XML-sitemap en geven server-side HTTP 200:
 
-## 1. Bestaande pagina's en routes
-
-### Huidige NVB-code
-
-Openbaar:
-- `/` — algemene Nova Vista Boost-landingspagina
-- `/auth` — inloggen/registreren
-- `/reset-password` — wachtwoordherstel
-- `*` — 404
-
-Achter login onder `/dashboard`:
-- `/dashboard`
-- `/dashboard/leads`
-- `/dashboard/pipeline`
-- `/dashboard/audits`
-- `/dashboard/ai-tools`
-- `/dashboard/social`
-- `/dashboard/social/health`
-- `/dashboard/social/health/:connectionId`
-- `/dashboard/publish-settings`
-- `/dashboard/content`
-- `/dashboard/content/overview`
-- `/dashboard/academy`
-- `/dashboard/settings`
-- `/dashboard/users`
-
-Bron: `src/App.tsx:33-52`.
-
-### Live website waar AIdiensten.com naartoe verwijst
-
-In sitemap en navigatie bevestigd:
 - `/`
 - `/ai-training-bedrijven`
 - `/ai-bedrijfsscan`
@@ -53,140 +24,172 @@ In sitemap en navigatie bevestigd:
 - `/privacy`
 - `/voorwaarden`
 
-Niet aanwezig (404):
-- `/quickscan`
+Een onbekende route (`/niet-bestaand`) geeft correct HTTP 404 en geen indexeerbare HTML.
+
+## Wat al goed staat
+
+### Robots en noindex
+
+- `https://novavistaprogressus.nl/robots.txt` geeft HTTP 200.
+- Regels: `User-Agent: *`, `Allow: /` en een verwijzing naar `https://novavistaprogressus.nl/sitemap.xml`.
+- Alle tien geteste publieke pagina's bevatten `meta robots="index, follow"`.
+- Er is geen globale `noindex` aangetroffen.
+
+### Sitemap
+
+- `/sitemap.xml` geeft HTTP 200 als XML en bevat alle tien bekende publieke routes.
+- URL's gebruiken consequent het canonieke HTTPS-hoofddomein.
+
+### Canonical
+
+- Iedere geteste publieke pagina heeft precies één self-referencing canonical op `https://novavistaprogressus.nl/...`.
+- De homepage canonical eindigt correct op `/`.
+- AIdiensten.com verwijst met 301 naar het hoofddomein; dat is coherent met de gekozen domeinstrategie.
+
+### Metadata, taal en koppen
+
+- Iedere geteste pagina heeft een eigen title, description en één H1.
+- De HTML-taal is overal `nl-NL`.
+- Voorbeelden:
+  - Homepage: `AI-diensten voor bedrijven | Nova Vista Progressus`
+  - Bedrijfsscan: `AI-bedrijfsscan voor Customer Service, Sales en Marketing | Nova Vista Progressus`
+  - Training: `AI-training voor bedrijven en personeel | Nova Vista Progressus`
+- Open Graph- en Twittermetadata zijn aanwezig op de homepage.
+
+### Routing en crawlbaarheid
+
+- De productie-site retourneert volledige, inhoudelijke HTML vanaf de server; dit is geen lege client-only SPA-shell.
+- Elke echte route geeft HTTP 200; niet-bestaande routes geven HTTP 404.
+- Navigatielinks zijn gewone `<a href>`-links en daardoor zonder JavaScript crawlbaar.
+- Dit is technisch gunstiger dan de statische React-SPA in de huidige NVB-repository.
+
+### Structured data
+
+- Organization JSON-LD staat op alle geteste productiepagina's.
+- `/ai-bedrijfsscan` heeft aanvullend Service + Offer-schema met €495 en Nederland als verzorgingsgebied.
+- `/ai-training-bedrijven` heeft Service-schema.
+- Boek- en auteurspagina's hebben aanvullende schema-items.
+
+### AI-/LLM-crawlbaarheid
+
+- `/llms.txt` geeft HTTP 200 en benoemt de organisatie, Pascal Dolleman, bedrijfsscan, €495, training, implementatie en menselijke controle.
+- De site bevat duidelijke entity-signalen voor Nova Vista Progressus, AI-bedrijfsscan, Customer Service, Sales, Marketing, AI-training, privacy en menselijke eindverantwoordelijkheid.
+
+### Oude verwijzingen op productie
+
+In de HTML van alle tien productiepagina's zijn geen verwijzingen gevonden naar:
+
+- `nova-vista-boost.lovable.app`
+- “Nova Vista Boost”
+- “Lovable”
+- `aidiensten.com`
+
+Dat laatste is bij deze strategie niet fout: AIdiensten.com is alleen een doorverwijzend domein.
+
+## Wat ontbreekt of aandacht verdient
+
+### 1. Google-status kan niet worden bevestigd
+
+Technisch staat indexatie open, maar er is in dit project geen Search Console-property gekoppeld voor `novavistaprogressus.nl`. Daardoor kan deze audit niet vaststellen:
+
+- of Google de sitemap al heeft verwerkt;
+- welke URL's “Discovered”, “Crawled” of “Indexed” zijn;
+- welke canonical Google daadwerkelijk heeft gekozen;
+- of er crawl-, soft-404- of duplicatieproblemen zijn.
+
+Dit is geen technisch gebrek van de site, maar een meetlacune in deze audit.
+
+### 2. Nieuwe site heeft tijd en signalen nodig
+
+Een technisch correcte nieuwe site wordt niet onmiddellijk volledig geïndexeerd. Google moet de URL's eerst ontdekken, crawlen, verwerken en beoordelen. Een sitemap en interne links versnellen ontdekking, maar garanderen geen indexatie of positie. Relevante content, externe vermeldingen en tijd blijven nodig.
+
+### 3. Sitemap is functioneel maar minimaal
+
+De sitemap bevat URL, `changefreq` en `priority`, maar geen `lastmod`. `lastmod` kan Google helpen gewijzigde pagina's efficiënter opnieuw te crawlen, mits de datum werkelijk de inhoudswijziging weergeeft.
+
+### 4. Geen zichtbare BreadcrumbList-schema's
+
+Dienst- en boekroutes hebben geen BreadcrumbList JSON-LD in de gecontroleerde HTML. Dit blokkeert indexatie niet, maar kan paginahiërarchie explicieter maken.
+
+### 5. Metadata kan scherper op MKB-intentie
+
+Technisch is metadata correct. Inhoudelijk ontbreken aparte pagina's/titles voor:
+
+- “AI advies MKB”
+- “AI implementatie MKB”
+
+De bestaande training- en scanpagina's dekken delen hiervan, maar niet als zelfstandige zoekintentie. Dit is een contentdekkingstekort, geen indexeerbaarheidsfout.
+
+### 6. H1 bedrijfsscan is creatief maar minder expliciet
+
+De bedrijfsscan-title bevat het hoofdzoekwoord exact; de H1 luidt “Waar kan AI binnen uw organisatie werkelijk renderen?”. Een explicietere H1 met “AI-bedrijfsscan” zou de onderwerpduidelijkheid voor bezoeker en crawler vergroten. Dit is optimalisatie, geen blocker.
+
+### 7. AIdiensten.com TLS apart controleren
+
+De read-only commandlinecontrole kreeg bij een directe HTTPS-aanvraag aan AIdiensten.com een certificaatnaam-mismatch, waarna een onveilige vervolgtest wel de 301 aantoonde. Browser/CDN-gedrag kan verschillen. Controleer het certificaat voor apex en www onafhankelijk; een geldige 301 is pas betrouwbaar als HTTPS vóór de redirect zonder certificaatwaarschuwing werkt.
+
+## Oude Lovable/Nova Vista Boost-verwijzingen in deze repository
+
+Deze staan **niet op de canonieke productie-site**, maar wel in het afzonderlijke NVB-portaal:
+
+- `index.html:2`: `lang="en"` bij Nederlandse inhoud.
+- `index.html:8-27`: Nova Vista Boost-titles/descriptions, canonical en OG URL naar `nova-vista-boost.lovable.app`, plus oude Lovable-previewafbeelding en `@Lovable`.
+- `src/pages/Index.tsx`: positionering als “AI Marketing Platform” met abonnementen €49/€149/€399.
+- `src/App.tsx`: slechts één openbare marketingroute; overige routes zijn auth/dashboard.
+- `public/`: geen robots.txt of sitemap.
+
+Omdat dit een apart klantportaal/demo is, schaadt dit de technische indexeerbaarheid van `novavistaprogressus.nl` niet. Wel is het verstandig het portaal `noindex` te maken als het niet zelfstandig in Google moet verschijnen, om merk- en contentverwarring te voorkomen.
+
+## Minimale wijzigingen met meeste SEO-effect
+
+### 1. Search Console valideren en sitemap indienen
+
+**Effect:** grootste diagnostische waarde; bevestigt of Google de site ziet en waar indexatie stokt.
+
+- Verifieer de domain property `novavistaprogressus.nl`.
+- Dien `/sitemap.xml` in.
+- Inspecteer eerst `/`, `/ai-bedrijfsscan` en `/ai-training-bedrijven`.
+- Vraag indexatie slechts één keer aan na een inhoudelijke wijziging; herhaald aanvragen versnelt Google niet structureel.
+
+**Geraakt:** externe Search Console-configuratie; geen sitecode nodig.
+
+### 2. Controleer/herstel TLS voor AIdiensten.com en www
+
+**Effect:** voorkomt dat bezoekers en crawlers de bedoelde 301 niet veilig kunnen volgen.
+
+**Geraakt:** DNS/CDN/hostingcertificaat van `aidiensten.com` en `www.aidiensten.com`; redirect naar `https://novavistaprogressus.nl/` behouden.
+
+### 3. Voeg echte `lastmod`-datums toe aan de sitemap
+
+**Effect:** helpt hercrawlprioritering bij een nieuwe en veranderende site; klein werk, laag risico.
+
+**Geraakt:** productie-sitemapgenerator of `sitemap.xml`. Gebruik alleen de werkelijke laatste inhoudswijziging per URL.
+
+### 4. Maak de twee ontbrekende intentiepagina's
+
+**Effect:** grootste inhoudelijke groeikans nadat indexeerbaarheid bevestigd is.
+
 - `/ai-advies-mkb`
 - `/ai-implementatie-mkb`
 
-## 2. Technische SEO
+Beide met unieke title, description, H1, self-canonical, Service-schema, interne links en opname in sitemap. Geen bijna-duplicaten van training/scan; ieder moet een eigen vraag en uitkomst beantwoorden.
 
-### Live website: sterke basis
+**Geraakt:** nieuwe productieroutes, hoofdnavigatie/footer of contextlinks, sitemap en schema. Deze bronbestanden bevinden zich niet in deze repository.
 
-- Server-rendered Nederlandstalige HTML; inhoud is zonder JavaScript leesbaar.
-- Homepage heeft één H1: **“AI die werkt binnen uw organisatie.”**
-- Unieke titles/descriptions/canonicals op de onderzochte pagina's.
-- `robots.txt` staat crawlen toe en verwijst naar de sitemap.
-- `sitemap.xml` bevat tien openbare URL's.
-- Organization-schema is aanwezig; de bedrijfsscan heeft aanvullend Service + Offer (€495) schema.
-- Goede interne hoofdnavigatie naar training, bedrijfsscan, boek, tarieven, over en contact.
+### 5. Maak de bedrijfsscan-H1 expliciet en voeg breadcrumbs toe
 
-### Live website: zwakke punten
+**Effect:** verhoogt onderwerpduidelijkheid en hiërarchie zonder herbouw.
 
-- `aidiensten.com` is geen indexeerbare hoofdsite: HTTP/HTTPS en www verwijzen met 301 naar `novavistaprogressus.nl`. Canonicals en schema noemen eveneens alleen Nova Vista Progressus. Zoekmachines zullen daarom de bestemmingssite indexeren, niet AIdiensten.com.
-- Rechtstreeks HTTPS-opvragen van AIdiensten.com gaf in deze audit een certificaatnaam-mismatch; na omzeilen volgde alsnog de 301. Dit verdient hosting/DNS-controle.
-- Er zijn geen afzonderlijke landingspagina's voor **AI advies MKB** en **AI implementatie MKB**; beide routes geven 404.
-- De H1 van de bedrijfsscan bevat het hoofdzoekwoord niet letterlijk. De title en body doen dat wel, maar de H1 **“Waar kan AI binnen uw organisatie werkelijk renderen?”** is minder expliciet.
-- De tarievenpagina richt title en H1 primair op AI-websites, niet op scan → advies → implementatie.
+- H1 bijvoorbeeld: “AI-bedrijfsscan: waar kan AI binnen uw organisatie renderen?”
+- Voeg BreadcrumbList toe op dienst- en boekdetailpagina's.
 
-### NVB-project: niet geschikt als huidige SEO-voorkant
+**Geraakt:** `/ai-bedrijfsscan`; gedeelde paginalayout/schemafunctie voor detailroutes.
 
-- `index.html:2` heeft `lang="en"` terwijl de inhoud Nederlands is.
-- Metadata en canonical positioneren “Nova Vista Boost / AI Marketing” en wijzen naar het Lovable-domein (`index.html:8-27`), niet naar AIdiensten.com.
-- Geen `public/robots.txt`, `public/sitemap.xml` of JSON-LD.
-- Eén generieke openbare pagina; geen indexeerbare dienstpagina's.
-- Interne links leiden vrijwel uitsluitend naar `/auth`; de footer heeft geen inhoudelijke navigatie (`src/components/Navbar.tsx`, `src/components/Footer.tsx`).
-- De H1 **“Versnel je groei met AI Marketing”** en vaste SaaS-prijzen (€49/€149/€399) sluiten niet aan op bedrijfsscan/advies/implementatie (`src/pages/Index.tsx:17-45,57-72`).
+## Prioriteit
 
-Er zijn geen actuele opgeslagen SEO-scans beschikbaar voor dit project; alle scanners staan op `not_scanned`. De conclusies hierboven komen uit broncode en live HTTP/HTML-controle.
+1. Search Console + sitemapstatus meten.
+2. TLS van AIdiensten.com controleren.
+3. Daarna pas inhoud uitbreiden en `lastmod` toevoegen.
+4. Geef Google vervolgens tijd: bij een nieuwe site kan ontdekking en indexatie dagen tot weken duren; rankings duren doorgaans langer en hangen ook af van kwaliteit, concurrentie en externe signalen.
 
-## 3. AI-vindbaarheid en entity-signalen
-
-### Goed
-
-- De live site levert volledige HTML aan crawlers.
-- `/llms.txt` bestaat en benoemt organisatie, auteur, diensten, €495-scan en menselijke controle.
-- Organization- en Service-schema koppelen Nova Vista Progressus, Pascal Dolleman, Nederland en de AI-bedrijfsscan.
-- De teksten bevatten nuttige entiteiten: Customer Service, Sales, Marketing, managementregie, menselijke controle, privacy, automatisering en training.
-
-### Onvoldoende
-
-- **AIdiensten.com** bouwt zelf geen entity-signaal op door de 301 en canonicals naar Nova Vista Progressus. Als AIdiensten.com het commerciële merk/domein moet worden, is dit de grootste inconsistentie.
-- “MKB” komt niet prominent genoeg terug in titles/H1's en de scanpagina sluit zzp/kleine bedrijven expliciet uit. Dat botst met zoekintentie rond “AI advies MKB”. Segmentatie is nodig: quickscan voor klein MKB, volledige scan voor organisaties met structurele afdelingen.
-- Er ontbreken zelfstandige, citeerbare pagina's voor advies en implementatie met duidelijke definities, aanpak, deliverables, KPI's, AI Act/AVG, pilot en borging.
-- De actuele expertise is vooral servicecopy. Er is weinig ondersteunende kennisinhoud rond selectie van use-cases, ROI-inschatting, implementatiestappen en governance waarmee zoekmachines en LLM's de expertise breder kunnen verifiëren.
-
-## 4. Funnel-audit
-
-Gewenste route:
-
-```text
-Gratis Quickscan → volledige AI-bedrijfsscan €495 → implementatie en/of training
-```
-
-Werkelijke route:
-
-```text
-Algemene homepage → bedrijfsscanpagina → gratis intake per mailto-link → €495 opdracht
-                                            ↘ trainingpagina als losse navigatieroute
-```
-
-- Er is **geen gratis Quickscan** of `/quickscan`; alleen een gratis intake zonder analyse of advies.
-- De betaalde bedrijfsscan is inhoudelijk helder: €495 excl. btw, maximaal drie afdelingen en vijftien deelnemers, menselijke beoordeling.
-- Op de scanpagina ontbreekt een concrete vervolgstap na de prioriteitenlijst, zoals “laat kans 1 implementeren” of “plan teamtraining”.
-- De trainingpagina noemt scan, implementatie en borging, maar is geen gerichte bottom-of-funnel pagina voor “AI implementatie MKB”.
-- De CTA voor de scan opent een vooraf ingevulde e-mail. Er is geen ingebed intakeformulier, directe bevestiging, planning of meetbare conversiestap.
-- Het contactformulier opent eveneens het lokale e-mailprogramma en slaat niets op. Dit faalt voor bezoekers zonder goed ingesteld mailprogramma en maakt funnelmeting beperkt.
-
-## 5. Belangrijkste conversielekken
-
-1. **Domein-/merkverlies:** bezoekers en zoekwaarde eindigen op novavistaprogressus.nl; AIdiensten.com kan geen zelfstandige commerciële autoriteit opbouwen.
-2. **Ontbrekende gratis Quickscan:** de beloofde laagdrempelige eerste stap bestaat niet; “gratis intake” heeft een hogere ervaren inspanning en levert geen direct resultaat.
-3. **Geen doorlopende offer ladder:** €495-scan heeft geen expliciete, directe vervolg-CTA naar implementatie of training op basis van de uitkomst.
-4. **Mailto als conversiemechanisme:** afhankelijk van lokale mailsoftware, geen betrouwbare ontvangstbevestiging en beperkt meetbaar.
-5. **Ontbrekende intentiepagina's:** “AI advies MKB” en “AI implementatie MKB” landen op 404 en kunnen niet ranken of converteren.
-6. **Doelgroepfrictie:** bedrijfsscan is voor middelgrote/grotere organisaties; de gewenste MKB-termen omvatten ook kleinere bedrijven. Zonder duidelijke segmentkeuze kan verkeer afhaken.
-7. **Tarievenverwarring:** `/tarieven` gaat vooral over websites, terwijl bezoekers vanuit scan/advies een prijs- en vervolgoverzicht voor AI-dienstverlening verwachten.
-
-## Exact de 5 wijzigingen met hoogste verwacht rendement
-
-### 1. Kies AIdiensten.com als echte, canonieke commerciële hoofdsite
-
-**Waarom hoogste rendement:** lost in één keer merk-, indexatie-, canonical- en vertrouwensfragmentatie op. Nu draagt AIdiensten.com alle organische waarde over aan een ander domein.
-
-**Gewenste wijziging:** serveer de website op AIdiensten.com met geldig TLS; zet alle self-referencing canonicals, sitemap, robots, schema en interne absolute URL's op dat domein. Redirect juist het oude domein per overeenkomstige route naar AIdiensten.com, niet alles naar de homepage.
-
-**Geraakte live routes/bestanden:** hosting/DNS/TLS; globale metadata/layout; `/robots.txt`; `/sitemap.xml`; `/llms.txt`; alle canonicals en Organization/Service-schema's. Deze live-sitebestanden zitten **niet in de huidige NVB-repository**.
-
-### 2. Bouw een echte gratis Quickscan als primaire instap
-
-**Waarom:** sluit direct aan op de Nederlandse “AI bedrijfsscan”-intentie: snel inzicht, lage drempel, concrete kansen. Het creëert de ontbrekende bovenkant van de funnel.
-
-**Gewenste wijziging:** nieuwe `/quickscan` met 8–12 zakelijke vragen, directe korte uitslag (volwassenheid + 3 kansgebieden), e-mailrapport en één duidelijke vervolgstap naar de €495-scan. Benoem expliciet dat het een indicatie is en menselijke beoordeling pas in de volledige scan volgt.
-
-**Geraakte live routes/bestanden:** nieuwe `/quickscan`; CTA's op `/`, `/ai-bedrijfsscan`, `/contact`; formulierverwerking/CRM en bedankpagina; sitemap; schema. Niet aanwezig in deze NVB-repository.
-
-### 3. Maak één expliciete offer-ladder op de bedrijfsscanpagina
-
-**Waarom:** verkleint het grootste commerciële gat tussen diagnose en omzet uit uitvoering.
-
-**Gewenste wijziging:** positioneer op `/ai-bedrijfsscan` drie duidelijk gekoppelde stappen: gratis Quickscan → bedrijfsscan €495 → gekozen implementatie/training. Voeg onder “Wat ontvangt uw organisatie?” concrete deliverables toe (prioriteitenmatrix, risico/randvoorwaarden, aanbevolen pilot, besluitgesprek) en twee vervolg-CTA's: “Start volledige scan” en “Bespreek implementatie”.
-
-**Geraakte live routes/bestanden:** `/ai-bedrijfsscan`; gedeelde CTA/component; `/contact` met bron/aanbod vooraf geselecteerd; Service/Offer-schema en interne links. Niet aanwezig in deze NVB-repository.
-
-### 4. Voeg aparte pagina's toe voor “AI advies MKB” en “AI implementatie MKB”
-
-**Waarom:** de twee belangrijkste midden- en onderkantzoekintenties hebben nu geen landingspagina. Concurrenten beantwoorden deze intenties met roadmaps, pilots, KPI's, integraties en governance.
-
-**Gewenste wijziging:** 
-- `/ai-advies-mkb`: use-caseprioritering, ROI-inschatting, roadmap, AVG/AI Act, managementbesluit, deliverables en CTA naar adviesgesprek/scan.
-- `/ai-implementatie-mkb`: pilot → integratie → training → menselijke controle → KPI-meting → borging, met concrete systemen/voorbeelden waar aantoonbaar.
-
-**Geraakte live routes/bestanden:** twee nieuwe routes; homepage/nav/footer; `/ai-bedrijfsscan`; `/ai-training-bedrijven`; sitemap; BreadcrumbList + Service-schema; interne links. Niet aanwezig in deze NVB-repository.
-
-### 5. Vervang mailto-conversies door een meetbaar intakepad
-
-**Waarom:** verbetert direct de voltooiingskans en maakt zichtbaar waar bezoekers uitvallen.
-
-**Gewenste wijziging:** ingebed formulier met maximaal vijf eerste velden, server-side verzending/opslag, duidelijke privacytekst, bevestigingspagina en bronvelden (`quickscan`, `bedrijfsscan`, `advies`, `implementatie`, `training`). Laat daarna een intake plannen of terugbelmoment kiezen. Meet minimaal CTA-click, formulierstart, formulierverzending en geboekte intake.
-
-**Geraakte live routes/bestanden:** `/contact`; `/ai-bedrijfsscan`; `/ai-training-bedrijven`; nieuwe bedank-/planroute; formulierhandler en analytics-events. Niet aanwezig in deze NVB-repository.
-
-## Rendementsvolgorde
-
-1. Canoniek domein en TLS
-2. Gratis Quickscan
-3. Offer-ladder op de scanpagina
-4. Advies- en implementatiepagina's
-5. Meetbare formulieren en opvolging
-
-Eerst domein/canonical oplossen; anders bouwen de overige verbeteringen autoriteit op voor het verkeerde domein.
+**Eindoordeel:** `novavistaprogressus.nl` is technisch goed crawlbaar en heeft geen aangetroffen noindex-, canonical-, routing- of oude-domeinblokkade. De grootste onzekerheid is niet de code, maar de nog onbevestigde Google-indexstatus. De grootste concrete technische aandachtspunten zijn het AIdiensten.com-certificaat, sitemap-`lastmod` en het bewust wel/niet indexeren van het aparte NVB-portaal.
