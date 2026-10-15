@@ -244,6 +244,14 @@ const SettingsPage = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
+          {!billingAvailable ? (
+            <p className="text-sm text-muted-foreground mb-4">Online betalen is nog niet beschikbaar. Neem contact op om een abonnement te starten.</p>
+          ) : currentTier !== "hobby" ? (
+            <Button size="sm" className="mb-4" disabled={checkoutLoading === "portal"} onClick={handlePortal}>
+              {checkoutLoading === "portal" ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+              Abonnement beheren
+            </Button>
+          ) : null}
           <div className="grid gap-4">
             {tiers.map((tier) => {
               const isActive = currentTier === tier.id;
@@ -272,7 +280,7 @@ const SettingsPage = () => {
                     <Button
                       size="sm"
                       variant="outline"
-                      disabled={checkoutLoading === tier.id}
+                      disabled={!billingAvailable || checkoutLoading === tier.id}
                       onClick={() => handleSubscribe(tier.id)}
                     >
                       {checkoutLoading === tier.id ? <Loader2 className="w-4 h-4 animate-spin" /> : "Upgraden"}
