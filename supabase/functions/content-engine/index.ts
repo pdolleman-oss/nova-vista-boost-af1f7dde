@@ -30,6 +30,10 @@ serve(async (req) => {
 
   const admin = createClient(supabaseUrl, serviceRoleKey);
 
+  // Server-side paid access: admin (platform owner) or active paid subscription.
+  const { data: hasAccess } = await admin.rpc("user_has_paid_access", { _user_id: user.id });
+  if (hasAccess !== true) return json({ success: false, error: "Een actief abonnement is vereist.", code: "SUBSCRIPTION_REQUIRED" }, 402);
+
   try {
     const url = new URL(req.url);
     const pathParts = url.pathname.split("/").filter(Boolean);
