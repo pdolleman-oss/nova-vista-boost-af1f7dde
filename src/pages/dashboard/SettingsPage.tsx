@@ -36,6 +36,7 @@ const SettingsPage = () => {
   const [orgId, setOrgId] = useState<string | null>(null);
   const [currentTier, setCurrentTier] = useState("hobby");
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
+  const [billingAvailable, setBillingAvailable] = useState(false);
 
   useEffect(() => {
     const load = async () => {
@@ -71,6 +72,14 @@ const SettingsPage = () => {
           setOrgName(org.name);
           setCurrentTier(org.subscription_tier || "hobby");
         }
+      }
+
+      const { data: status } = await supabase.functions.invoke("stripe-checkout", { body: { action: "status" } });
+      setBillingAvailable(status?.available === true);
+
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("checkout") === "success") {
+        toast.info("Betaling ontvangen door Stripe. Je abonnement wordt actief zodra de bevestiging binnen is.");
       }
 
       setLoading(false);
@@ -132,17 +141,33 @@ const SettingsPage = () => {
     }
     setCheckoutLoading(tierId);
     try {
-      const { data, error } = await supabase.functions.invoke("mollie-checkout", {
+      const { data, error } = await supabase.functions.invoke("stripe-checkout", {
         body: { tier: tierId, organizationId: orgId },
       });
-      if (error) throw error;
-      if (data?.checkoutUrl) {
-        window.location.href = data.checkoutUrl;
-      } else {
-        toast.error("Kon geen betaallink aanmaken.");
+      if (error) {
+        const ctx = await (error as any).context?.json?.().catch(() => null);
+        throw new Error(ctx?.error || error.message);
       }
+      if (data?.url) window.location.href = data.url;
+      else toast.error("Kon geen betaallink aanmaken.");
     } catch (err: any) {
       toast.error("Betaling starten mislukt: " + (err.message || "Onbekende fout"));
+    }
+    setCheckoutLoading(null);
+  };
+
+  const handlePortal = async () => {
+    if (!orgId) return;
+    setCheckoutLoading("portal");
+    try {
+      const { data, error } = await supabase.functions.invoke("stripe-portal", { body: { organizationId: orgId } });
+      if (error) {
+        const ctx = await (error as any).context?.json?.().catch(() => null);
+        throw new Error(ctx?.error || error.message);
+      }
+      if (data?.url) window.location.href = data.url;
+    } catch (err: any) {
+      toast.error("Abonnementbeheer openen mislukt: " + (err.message || "Onbekende fout"));
     }
     setCheckoutLoading(null);
   };
