@@ -36,6 +36,7 @@ const SettingsPage = () => {
   const [orgId, setOrgId] = useState<string | null>(null);
   const [currentTier, setCurrentTier] = useState("hobby");
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
+  const [billingAvailable, setBillingAvailable] = useState(false);
 
   useEffect(() => {
     const load = async () => {
@@ -71,6 +72,14 @@ const SettingsPage = () => {
           setOrgName(org.name);
           setCurrentTier(org.subscription_tier || "hobby");
         }
+      }
+
+      const { data: status } = await supabase.functions.invoke("stripe-checkout", { body: { action: "status" } });
+      setBillingAvailable(status?.available === true);
+
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("checkout") === "success") {
+        toast.info("Betaling ontvangen door Stripe. Je abonnement wordt actief zodra de bevestiging binnen is.");
       }
 
       setLoading(false);
@@ -132,17 +141,33 @@ const SettingsPage = () => {
     }
     setCheckoutLoading(tierId);
     try {
-      const { data, error } = await supabase.functions.invoke("mollie-checkout", {
+      const { data, error } = await supabase.functions.invoke("stripe-checkout", {
         body: { tier: tierId, organizationId: orgId },
       });
-      if (error) throw error;
-      if (data?.checkoutUrl) {
-        window.location.href = data.checkoutUrl;
-      } else {
-        toast.error("Kon geen betaallink aanmaken.");
+      if (error) {
+        const ctx = await (error as any).context?.json?.().catch(() => null);
+        throw new Error(ctx?.error || error.message);
       }
+      if (data?.url) window.location.href = data.url;
+      else toast.error("Kon geen betaallink aanmaken.");
     } catch (err: any) {
       toast.error("Betaling starten mislukt: " + (err.message || "Onbekende fout"));
+    }
+    setCheckoutLoading(null);
+  };
+
+  const handlePortal = async () => {
+    if (!orgId) return;
+    setCheckoutLoading("portal");
+    try {
+      const { data, error } = await supabase.functions.invoke("stripe-portal", { body: { organizationId: orgId } });
+      if (error) {
+        const ctx = await (error as any).context?.json?.().catch(() => null);
+        throw new Error(ctx?.error || error.message);
+      }
+      if (data?.url) window.location.href = data.url;
+    } catch (err: any) {
+      toast.error("Abonnementbeheer openen mislukt: " + (err.message || "Onbekende fout"));
     }
     setCheckoutLoading(null);
   };
@@ -219,6 +244,14 @@ const SettingsPage = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
+          {!billingAvailable ? (
+            <p className="text-sm text-muted-foreground mb-4">Online betalen is nog niet beschikbaar. Neem contact op om een abonnement te starten.</p>
+          ) : currentTier !== "hobby" ? (
+            <Button size="sm" className="mb-4" disabled={checkoutLoading === "portal"} onClick={handlePortal}>
+              {checkoutLoading === "portal" ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+              Abonnement beheren
+            </Button>
+          ) : null}
           <div className="grid gap-4">
             {tiers.map((tier) => {
               const isActive = currentTier === tier.id;
@@ -247,7 +280,7 @@ const SettingsPage = () => {
                     <Button
                       size="sm"
                       variant="outline"
-                      disabled={checkoutLoading === tier.id}
+                      disabled={!billingAvailable || checkoutLoading === tier.id}
                       onClick={() => handleSubscribe(tier.id)}
                     >
                       {checkoutLoading === tier.id ? <Loader2 className="w-4 h-4 animate-spin" /> : "Upgraden"}

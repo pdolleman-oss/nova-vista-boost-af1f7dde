@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.5"
+    PostgrestVersion: "14.1"
   }
   public: {
     Tables: {
@@ -141,6 +141,88 @@ export type Database = {
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      billing_customers: {
+        Row: {
+          created_at: string
+          created_by: string
+          livemode: boolean
+          organization_id: string
+          stripe_customer_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          livemode: boolean
+          organization_id: string
+          stripe_customer_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          livemode?: boolean
+          organization_id?: string
+          stripe_customer_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "billing_customers_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: true
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      billing_subscriptions: {
+        Row: {
+          cancel_at_period_end: boolean
+          current_period_end: string | null
+          last_event_created: number
+          livemode: boolean
+          organization_id: string
+          price_id: string | null
+          status: string
+          stripe_customer_id: string
+          stripe_subscription_id: string
+          tier: string | null
+          updated_at: string
+        }
+        Insert: {
+          cancel_at_period_end?: boolean
+          current_period_end?: string | null
+          last_event_created?: number
+          livemode: boolean
+          organization_id: string
+          price_id?: string | null
+          status: string
+          stripe_customer_id: string
+          stripe_subscription_id: string
+          tier?: string | null
+          updated_at?: string
+        }
+        Update: {
+          cancel_at_period_end?: boolean
+          current_period_end?: string | null
+          last_event_created?: number
+          livemode?: boolean
+          organization_id?: string
+          price_id?: string | null
+          status?: string
+          stripe_customer_id?: string
+          stripe_subscription_id?: string
+          tier?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "billing_subscriptions_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
             referencedColumns: ["id"]
           },
         ]
@@ -1280,6 +1362,30 @@ export type Database = {
           },
         ]
       }
+      stripe_webhook_events: {
+        Row: {
+          event_id: string
+          event_type: string
+          livemode: boolean
+          processed_at: string | null
+          received_at: string
+        }
+        Insert: {
+          event_id: string
+          event_type: string
+          livemode: boolean
+          processed_at?: string | null
+          received_at?: string
+        }
+        Update: {
+          event_id?: string
+          event_type?: string
+          livemode?: boolean
+          processed_at?: string | null
+          received_at?: string
+        }
+        Relationships: []
+      }
       system_prompts: {
         Row: {
           created_at: string
@@ -1483,6 +1589,7 @@ export type Database = {
         Args: { _organization_id: string }
         Returns: boolean
       }
+      user_has_paid_access: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
       ai_mode: "safe" | "auto"

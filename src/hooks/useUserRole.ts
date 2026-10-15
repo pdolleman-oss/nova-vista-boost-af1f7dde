@@ -53,8 +53,8 @@ export function useUserRole(): UserRoleInfo {
         if (org) tier = org.subscription_tier;
       }
 
-      // Admins and owners always have free access
-      const hasFreeAccess = isAdmin || isOwner;
+      // Only platform admins have free access; paying clients need an active subscription (enforced server-side).
+      const hasFreeAccess = isAdmin;
 
       setState({
         roles: userRoles,

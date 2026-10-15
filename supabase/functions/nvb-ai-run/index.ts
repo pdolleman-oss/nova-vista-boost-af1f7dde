@@ -50,6 +50,14 @@ serve(async (req) => {
 
   const adminClient = createClient(supabaseUrl, serviceRoleKey);
 
+  // Server-side paid access: admin (platform owner) or active paid subscription.
+  const { data: hasAccess } = await adminClient.rpc("user_has_paid_access", { _user_id: user.id });
+  if (hasAccess !== true) {
+    return new Response(JSON.stringify({ success: false, error: "Een actief abonnement is vereist.", code: "SUBSCRIPTION_REQUIRED" }), {
+      status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
   try {
     const body = await req.json();
     const { project_id, task_type, module_name, input_text, context } = body;
