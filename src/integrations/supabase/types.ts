@@ -171,7 +171,7 @@ export type Database = {
           {
             foreignKeyName: "billing_customers_organization_id_fkey"
             columns: ["organization_id"]
-            isOneToOne: true
+            isOneToOne: false
             referencedRelation: "organizations"
             referencedColumns: ["id"]
           },
@@ -181,6 +181,7 @@ export type Database = {
         Row: {
           cancel_at_period_end: boolean
           current_period_end: string | null
+          invoice_paid: boolean
           last_event_created: number
           livemode: boolean
           organization_id: string
@@ -194,6 +195,7 @@ export type Database = {
         Insert: {
           cancel_at_period_end?: boolean
           current_period_end?: string | null
+          invoice_paid?: boolean
           last_event_created?: number
           livemode: boolean
           organization_id: string
@@ -207,6 +209,7 @@ export type Database = {
         Update: {
           cancel_at_period_end?: boolean
           current_period_end?: string | null
+          invoice_paid?: boolean
           last_event_created?: number
           livemode?: boolean
           organization_id?: string
@@ -1577,6 +1580,16 @@ export type Database = {
     }
     Functions: {
       admin_get_stats: { Args: never; Returns: Json }
+      apply_billing_event: {
+        Args: {
+          _created: number
+          _event_id: string
+          _event_type: string
+          _live: boolean
+          _sub: Json
+        }
+        Returns: string
+      }
       get_invitation_by_token: { Args: { _token: string }; Returns: Json }
       has_role: {
         Args: {
