@@ -63,7 +63,7 @@ const Index = () => (
           Nova Vista Boost is het all-in-one platform voor slimme groei.
         </p>
         <div className="flex items-center justify-center gap-4">
-          <Link to="/auth">
+          <Link to="/auth?mode=register">
             <Button size="lg" className="gap-2">
               Gratis starten <ArrowRight className="w-4 h-4" />
             </Button>
@@ -138,7 +138,7 @@ const Index = () => (
                     </li>
                   ))}
                 </ul>
-                <Link to="/auth" className="w-full">
+                <Link to="/auth?mode=register" className="w-full">
                   <Button className="w-full" variant={plan.popular ? "default" : "outline"}>
                     {plan.cta}
                   </Button>
@@ -155,7 +155,7 @@ const Index = () => (
       <div className="container max-w-2xl text-center">
         <h2 className="text-3xl font-bold mb-4 text-foreground">Klaar om te groeien?</h2>
         <p className="text-muted-foreground mb-8">Start vandaag nog gratis en ontdek hoe AI je marketing kan versnellen.</p>
-        <Link to="/auth">
+        <Link to="/auth?mode=register">
           <Button size="lg" className="gap-2">
             Start gratis <ArrowRight className="w-4 h-4" />
           </Button>

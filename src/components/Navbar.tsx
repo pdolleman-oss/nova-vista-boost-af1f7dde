@@ -7,10 +7,10 @@ const Navbar = () => (
     <div className="container flex h-16 items-center justify-between">
       <Logo />
       <div className="flex items-center gap-4">
-        <Link to="/auth">
+        <Link to="/auth?mode=login">
           <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">Inloggen</Button>
         </Link>
-        <Link to="/auth">
+        <Link to="/auth?mode=register">
           <Button size="sm">Gratis starten</Button>
         </Link>
       </div>
