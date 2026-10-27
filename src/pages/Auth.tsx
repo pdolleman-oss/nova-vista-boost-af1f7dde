@@ -1,16 +1,29 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import Logo from "@/components/Logo";
 
 type View = "login" | "register" | "forgot";
 
 const Auth = () => {
-  const [view, setView] = useState<View>("login");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const modeFromUrl = (): View => (searchParams.get("mode") === "register" ? "register" : "login");
+  const [view, setViewState] = useState<View>(modeFromUrl);
+
+  useEffect(() => {
+    const m = searchParams.get("mode");
+    if (m === "register" || m === "login") setViewState(m);
+    else if (m === null) setViewState((v) => (v === "forgot" ? v : "login"));
+  }, [searchParams]);
+
+  const setView = (v: View) => {
+    setViewState(v);
+    if (v === "login" || v === "register") setSearchParams({ mode: v });
+  };
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
