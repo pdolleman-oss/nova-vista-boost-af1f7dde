@@ -85,11 +85,14 @@ Deno.serve(async (req) => {
         const { data: subs } = await db.from("billing_subscriptions").select("tier,status,current_period_end").eq("organization_id", binding.organization_id);
         const now = Math.floor(Date.now() / 1000);
         const entitled = (subs ?? []).find((s) => s.tier && subscriptionGrantsAccess(s.status, s.current_period_end ? Date.parse(s.current_period_end) / 1000 : null, now));
-        await db.from("organizations").update({ subscription_tier: entitled?.tier ?? "hobby" }).eq("id", binding.organization_id);
+        const { error: orgUpdateError } = await db.from("organizations").update({ subscription_tier: entitled?.tier ?? "hobby" }).eq("id", binding.organization_id);
+        // Do NOT mark the event processed when the tier sync fails; Stripe can safely retry.
+        if (orgUpdateError) return text("org_tier_update_failed", 500);
       }
     }
   }
 
-  await db.from("stripe_webhook_events").update({ processed_at: new Date().toISOString() }).eq("event_id", event.id);
+  const { error: processedError } = await db.from("stripe_webhook_events").update({ processed_at: new Date().toISOString() }).eq("event_id", event.id);
+  if (processedError) return text("processed_at_update_failed", 500);
   return text("ok");
 });
