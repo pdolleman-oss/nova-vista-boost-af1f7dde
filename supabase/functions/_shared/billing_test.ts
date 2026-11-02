@@ -35,3 +35,35 @@ Deno.test("only active/trialing unexpired subscriptions grant access", () => {
   assertEquals(subscriptionGrantsAccess("incomplete", 200, 100), false);
   assertEquals(subscriptionGrantsAccess("unpaid", 200, 100), false);
 });
+
+import { couponParamsForGrant, grantActive, validateGrantInput } from "./billing.ts";
+const NOW = Date.parse("2026-11-02T00:00:00Z");
+const g = (o: Partial<any>) => ({ kind: "free", percent_off: null, amount_off_cents: null, starts_at: "2026-11-01T00:00:00Z", ends_at: null, revoked_at: null, ...o });
+
+Deno.test("grant needs a reason", () => assertEquals(validateGrantInput({ kind: "free", reason: "" }, NOW), "reason_required"));
+Deno.test("percent must be between 0 and 100 exclusive (100% = free grant)", () => {
+  assertEquals(validateGrantInput({ kind: "percent", percentOff: 100, reason: "eigen bedrijf" }, NOW), "invalid_percent");
+  assertEquals(validateGrantInput({ kind: "percent", percentOff: 25, reason: "partner" }, NOW), null);
+});
+Deno.test("fixed amount must be positive whole cents", () => {
+  assertEquals(validateGrantInput({ kind: "amount", amountOffCents: 10.5, reason: "partner" }, NOW), "invalid_amount");
+  assertEquals(validateGrantInput({ kind: "amount", amountOffCents: 1000, reason: "partner" }, NOW), null);
+});
+Deno.test("end date in the past is refused", () => {
+  assertEquals(validateGrantInput({ kind: "free", reason: "eigen", endsAt: "2026-10-01T00:00:00Z" }, NOW), "invalid_end");
+});
+Deno.test("revoked, expired or future grants are not active", () => {
+  assertEquals(grantActive(g({}), NOW), true);
+  assertEquals(grantActive(g({ revoked_at: "2026-11-01T12:00:00Z" }), NOW), false);
+  assertEquals(grantActive(g({ ends_at: "2026-11-01T12:00:00Z" }), NOW), false);
+  assertEquals(grantActive(g({ starts_at: "2026-12-01T00:00:00Z" }), NOW), false);
+});
+Deno.test("coupon: percent forever, fixed amount in EUR cents with repeating duration", () => {
+  assertEquals(couponParamsForGrant(g({ kind: "percent", percent_off: 20 }), NOW), { percent_off: 20, duration: "forever" });
+  assertEquals(couponParamsForGrant(g({ kind: "amount", amount_off_cents: 1000, ends_at: "2027-02-01T00:00:00Z" }), NOW),
+    { amount_off: 1000, currency: "eur", duration: "repeating", duration_in_months: 3 });
+});
+Deno.test("free grant never produces a Stripe coupon", () => {
+  let threw = false; try { couponParamsForGrant(g({}), NOW); } catch { threw = true; }
+  assertEquals(threw, true);
+});
